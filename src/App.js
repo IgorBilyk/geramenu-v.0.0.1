@@ -1,8 +1,9 @@
 // App.js
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './components/Login/Login';
-import Menu from './components/Menu/Menu';
-import ItemsList from './components/ItemList/ItemList';
+import Login from './components/pages/Login/Login';
+import Menu from './components/pages/Menu/Menu';
+import ItemsList from './components/pages/ItemList/ItemList';
+import Settings from './components/pages/settings/Settings';
 
 function App() {
   return (
@@ -11,6 +12,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/items" element={<ItemsList />} />
+        <Route path="/settings" element={<Settings />} />
       </Routes>
     </Router>
   );
