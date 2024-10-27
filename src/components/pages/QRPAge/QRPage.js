@@ -6,7 +6,7 @@ import jsPDF from 'jspdf';
 import { FacebookShareButton, TwitterShareButton } from 'react-share';
 import Navbar from '../../ui/Navbar';
 
-const ItemsList = () => {
+const QRPage = () => {
   const [items, setItems] = useState([]);
   const qrRef = useRef();
 
@@ -84,8 +84,7 @@ const ItemsList = () => {
       <h2>Menu Items</h2>
       {items.map((item, index) => (
         <div key={index}>
-          <h3>{item.name}</h3>
-          <div ref={qrRef}>
+                    <div ref={qrRef}>
             <QRCodeSVG value={`https://yourapp.com/menu/${item.userId}`} />
           </div>
           <button onClick={() => generatePDF(`https://yourapp.com/menu/${item.userId}`)}>
@@ -106,4 +105,4 @@ const ItemsList = () => {
   );
 };
 
-export default ItemsList;
+export default QRPage;
