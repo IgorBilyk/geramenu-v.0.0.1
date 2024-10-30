@@ -8,6 +8,7 @@ const Navbar = ({ active }) => {
   const handleSignOut = async () => {
     await signOut(auth);
     navigate("/");
+    localStorage.removeItem('userID')
   };
 
   const handleNavigateToSettings = () => {
@@ -16,14 +17,14 @@ const Navbar = ({ active }) => {
 
   const handleNavigateToPreview = () => {
     const userId = auth?.currentUser?.uid || localStorage.getItem("userID")
-    navigate(`/preview/${userId}`);
+    navigate(`/previewint/${userId}`);
   };
   const handleNavigateToItemList = () => {
     navigate("/items"); // Redirect to the ItemList component
   };
 
   return (
-    <nav className="bg-blue-500 text-white py-4 px-6 flex justify-between items-center">
+    <nav className="bg-blue-500 text-white py-4 px-6 flex justify-between items-center fixed top-0 w-[100%]">
       <div>
         <Link to="/" className="text-2xl font-bold">
           Menu Management

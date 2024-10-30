@@ -5,7 +5,7 @@ import { useParams } from "react-router-dom";
 import Navbar from "../../ui/Navbar";
 import { FaArrowUp } from "react-icons/fa";
 
-const PreviewPage = () => {
+const PreviewExternalPage = () => {
   const { userId } = useParams(); // Extract user ID from URL
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -16,17 +16,12 @@ const PreviewPage = () => {
   useEffect(() => {
     const fetchItems = async () => {
       const itemsRef = collection(db, "menuItems");
-      /*    const q = query(itemsRef); */
-
-      const q = query(
-        collection(db, "menuItems"),
-        where("userId", "==", userId)
-      );
+      const q = query(itemsRef, where("userId", "==", userId));
       const querySnapshot = await getDocs(q);
       const menuItems = querySnapshot.docs.map((doc) => doc.data());
 
       setItems(menuItems);
-      // Extract unique categories
+
       const uniqueCategories = [
         ...new Set(menuItems.map((item) => item.category)),
       ];
@@ -45,7 +40,6 @@ const PreviewPage = () => {
   };
 
   const handleScroll = () => {
-    // Highlight navbar category based on what's visible
     const categoryElements = categories?.map(
       (category) => categoryRefs?.current[category]
     );
@@ -69,10 +63,9 @@ const PreviewPage = () => {
 
   return (
     <div>
-      <Navbar />
+   {/*    <Navbar /> */}
       <div ref={topRef}>
-        {/* Fixed Navbar */}
-        <nav className="fixed top-0 left-0 w-full bg-white shadow-lg z-10">
+        <nav className="fixed top-20 left-0 w-full bg-white shadow-lg z-10">
           <div className="flex justify-center space-x-4 py-3">
             {categories.map((category) => (
               <button
@@ -89,7 +82,7 @@ const PreviewPage = () => {
             ))}
           </div>
         </nav>
-        <div className="container mx-auto pt-20 mt-4">
+        <div className="container mx-auto pt-20 mt-20">
           <h1 className="text-4xl font-bold mb-8">Menu</h1>
           {categories.map((category) => (
             <div
@@ -102,12 +95,14 @@ const PreviewPage = () => {
                   ?.filter((item) => item.category === category)
                   ?.map((item, index) => (
                     <div key={index} className="border p-4 shadow rounded">
-                      <img
-                        src={`${item.image}`}
-                        alt="meal name"
-                        className="max-w-screen-sm max-h-[400px]"
-                      />
-                      <h3 className="text-xl font-semibold">{item.name}</h3>
+                      <div className="w-full h-48 overflow-hidden rounded-lg">
+                        <img
+                          src={`${item.image}`}
+                          alt={item.name}
+                          className="object-cover w-full h-full"
+                        />
+                      </div>
+                      <h3 className="text-xl font-semibold mt-4">{item.name}</h3>
                       <p>{item.description}</p>
                       <p className="font-bold">${item.price}</p>
                     </div>
@@ -128,4 +123,4 @@ const PreviewPage = () => {
   );
 };
 
-export default PreviewPage;
+export default PreviewExternalPage;

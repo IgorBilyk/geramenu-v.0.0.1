@@ -54,14 +54,15 @@ const AddMenu = () => {
     setLoading(true);
 
     try {
-      const imageRef = ref(storage, `images/${item.image.name}`);
+      const userId = auth.currentUser.uid;
+      const imageRef = ref(storage, `menuImages/${userId}/${item.image.name}`);
       await uploadBytes(imageRef, item.image);
       const imageUrl = await getDownloadURL(imageRef);
 
       await addDoc(collection(db, "menuItems"), {
         ...item,
         image: imageUrl,
-        userId: auth.currentUser.uid,
+        userId,
         variants,
         createdAt: serverTimestamp(),
         modifiedAt: serverTimestamp(),
@@ -92,7 +93,7 @@ const AddMenu = () => {
     <div className="min-h-screen bg-gray-100">
       <Navbar active="menu" />
 
-      <div className="flex flex-col items-center mt-10">
+      <div className="flex flex-col items-center mt-20">
         <div className="w-full max-w-md bg-white p-6 shadow-md rounded-md">
           <h2 className="text-2xl font-semibold mb-6">Add Menu Item</h2>
           {error && <p className="text-red-500 mb-4">{error}</p>}

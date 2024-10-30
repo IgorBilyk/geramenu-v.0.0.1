@@ -115,7 +115,7 @@ const Login = () => {
 
   return (
     <div className="flex min-h-[100vh] justify-center items-center bg-gray-100 lg:gap-5 lg:px-20 rounded-md shadow-sm">
-      <div class="sm:flex-1">
+      <div className="sm:flex-1">
         <form className="  bg-white px-20">
           <h5>Icon</h5>
           <h2 className="text-2xl font-sbold mb-5 text-center">
