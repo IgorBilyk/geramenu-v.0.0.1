@@ -60,6 +60,7 @@ const PreviewInternalPage = () => {
   const scrollToTop = () => {
     topRef.current.scrollIntoView({ behavior: "smooth" });
   };
+  console.log(!items)
 
   return (
     <div>
@@ -84,6 +85,7 @@ const PreviewInternalPage = () => {
         </nav>
         <div className="container mx-auto pt-20 mt-20">
           <h1 className="text-4xl font-bold mb-8">Menu</h1>
+          {items==false && <p>No Items</p>}
           {categories.map((category) => (
             <div
               key={category}

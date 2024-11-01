@@ -1,64 +1,56 @@
-import { useState, useEffect, useRef } from 'react';
-import { db } from '../../../firebase/firebase';
-import { collection, query, getDocs } from 'firebase/firestore';
-import { QRCodeSVG } from 'qrcode.react';
-import jsPDF from 'jspdf';
-import { FacebookShareButton, TwitterShareButton } from 'react-share';
-import Navbar from '../../ui/Navbar';
+import { useState, useEffect, useRef } from "react";
+import { QRCodeSVG } from "qrcode.react";
+import jsPDF from "jspdf";
+import { FacebookShareButton, TwitterShareButton } from "react-share";
+import Navbar from "../../ui/Navbar";
 
 const QRPage = () => {
-  const [items, setItems] = useState([]);
+  const [userId, setUserId] = useState(null);
   const qrRef = useRef();
 
   useEffect(() => {
-    const fetchItems = async () => {
-      const q = query(collection(db, 'menuItems'));
-      const querySnapshot = await getDocs(q);
-      setItems(querySnapshot.docs.map(doc => doc.data()));
-    };
-
-    fetchItems();
+    // Fetch the user ID from local storage
+    const storedUserId = localStorage.getItem("userID");
+    setUserId(storedUserId);
   }, []);
 
-  // Convert the SVG QR code to Data URL for PDF
-  const generatePDF = (qrURL) => {
-    const qrCodeSVG = qrRef.current.querySelector('svg');
+  // Function to generate a PDF with the QR code
+  const generatePDF = () => {
+    const qrCodeSVG = qrRef.current.querySelector("svg");
     const svgData = new XMLSerializer().serializeToString(qrCodeSVG);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
     const img = new Image();
 
-    img.onload = function() {
+    img.onload = function () {
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
 
-      // Create the PDF
       const pdf = new jsPDF();
-      pdf.text('Scan the QR Code to view the menu:', 10, 10);
-      pdf.addImage(canvas.toDataURL('image/png'), 'PNG', 15, 40, 180, 160);
-      pdf.save('menu.pdf');
+      pdf.text("Scan the QR Code to view the menu:", 10, 10);
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 15, 40, 180, 160);
+      pdf.save("menu.pdf");
     };
 
-    img.src = 'data:image/svg+xml;base64,' + btoa(svgData); // Convert SVG to base64
+    img.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
 
-  // Function to open print dialog with QR code
-  const printQRCode = (qrURL) => {
-    const qrCodeSVG = qrRef.current.querySelector('svg');
+  // Function to print the QR code
+  const printQRCode = () => {
+    const qrCodeSVG = qrRef.current.querySelector("svg");
     const svgData = new XMLSerializer().serializeToString(qrCodeSVG);
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
     const img = new Image();
 
-    img.onload = function() {
+    img.onload = function () {
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
 
-      const dataUrl = canvas.toDataURL('image/png');
-
-      const printWindow = window.open('', '_blank');
+      const dataUrl = canvas.toDataURL("image/png");
+      const printWindow = window.open("", "_blank");
       printWindow.document.write(`
         <html>
           <head>
@@ -75,32 +67,53 @@ const QRPage = () => {
       printWindow.close();
     };
 
-    img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+    img.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
 
   return (
-    <div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
       <Navbar active="items" />
-      <h2>Menu Items</h2>
-      {items.map((item, index) => (
-        <div key={index}>
-                    <div ref={qrRef}>
-            <QRCodeSVG value={`https://yourapp.com/menu/${item.userId}`} />
-          </div>
-          <button onClick={() => generatePDF(`https://yourapp.com/menu/${item.userId}`)}>
-            Download PDF
-          </button>
-          <button onClick={() => printQRCode(`https://yourapp.com/menu/${item.userId}`)}>
-            Print QR Code
-          </button>
-          <FacebookShareButton url={`https://yourapp.com/menu/${item.userId}`}>
-            Share on Facebook
-          </FacebookShareButton>
-          <TwitterShareButton url={`https://yourapp.com/menu/${item.userId}`}>
-            Share on Twitter
-          </TwitterShareButton>
+      <h2 className="text-2xl font-bold mb-4">Scan to View Menu</h2>
+      
+      {userId && (
+        <div ref={qrRef} className="bg-white p-6 rounded-lg shadow-lg">
+          <QRCodeSVG
+            value={`https://yourapp.com/previewext/${userId}`}
+            size={200}
+          />
         </div>
-      ))}
+      )}
+      
+      <div className="mt-4 space-x-4">
+        <button
+          onClick={generatePDF}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+        >
+          Download PDF
+        </button>
+        <button
+          onClick={printQRCode}
+          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+        >
+          Print QR Code
+        </button>
+        <FacebookShareButton
+          url={`https://yourapp.com/previewext/${userId}`}
+          className="inline-block"
+        >
+          <button className="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800">
+            Share on Facebook
+          </button>
+        </FacebookShareButton>
+        <TwitterShareButton
+          url={`https://yourapp.com/previewext/${userId}`}
+          className="inline-block"
+        >
+          <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+            Share on Twitter
+          </button>
+        </TwitterShareButton>
+      </div>
     </div>
   );
 };
