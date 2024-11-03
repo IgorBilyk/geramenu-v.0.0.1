@@ -71,48 +71,50 @@ const QRPage = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex flex-col min-h-screen bg-gray-100">
       <Navbar active="items" />
-      <h2 className="text-2xl font-bold mb-4">Scan to View Menu</h2>
-      
-      {userId && (
-        <div ref={qrRef} className="bg-white p-6 rounded-lg shadow-lg">
-          <QRCodeSVG
-            value={`https://yourapp.com/previewext/${userId}`}
-            size={200}
-          />
+      <div className="flex flex-col justify-center items-center min-h-[100vh]">
+        <h2 className="text-2xl font-bold mb-4">Scan to View Menu</h2>
+        
+        {userId && (
+          <div ref={qrRef} className="bg-white p-6 rounded-lg shadow-lg">
+            <QRCodeSVG
+              value={`https://yourapp.com/previewext/${userId}`}
+              size={200}
+            />
+          </div>
+        )}
+        
+        <div className="mt-4 space-x-4">
+          <button
+            onClick={generatePDF}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          >
+            Download PDF
+          </button>
+          <button
+            onClick={printQRCode}
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+          >
+            Print QR Code
+          </button>
+          <FacebookShareButton
+            url={`https://yourapp.com/previewext/${userId}`}
+            className="inline-block"
+          >
+            <button className="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800">
+              Share on Facebook
+            </button>
+          </FacebookShareButton>
+          <TwitterShareButton
+            url={`https://yourapp.com/previewext/${userId}`}
+            className="inline-block"
+          >
+            <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
+              Share on Twitter
+            </button>
+          </TwitterShareButton>
         </div>
-      )}
-      
-      <div className="mt-4 space-x-4">
-        <button
-          onClick={generatePDF}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-        >
-          Download PDF
-        </button>
-        <button
-          onClick={printQRCode}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-        >
-          Print QR Code
-        </button>
-        <FacebookShareButton
-          url={`https://yourapp.com/previewext/${userId}`}
-          className="inline-block"
-        >
-          <button className="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800">
-            Share on Facebook
-          </button>
-        </FacebookShareButton>
-        <TwitterShareButton
-          url={`https://yourapp.com/previewext/${userId}`}
-          className="inline-block"
-        >
-          <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
-            Share on Twitter
-          </button>
-        </TwitterShareButton>
       </div>
     </div>
   );

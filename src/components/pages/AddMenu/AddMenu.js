@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { db, storage, auth } from "../../../firebase/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import Navbar from "../../ui/Navbar";
+import { Toaster, toast } from "sonner";
 
-const AddMenu = () => {
+const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
   const [item, setItem] = useState({
     category: "",
     name: "",
@@ -33,6 +33,12 @@ const AddMenu = () => {
     updatedVariants[index][field] = value;
     setVariants(updatedVariants);
   };
+
+  useEffect(() => {
+    if (itemToEdit) {
+      setItem(itemToEdit);
+    }
+  }, [itemToEdit]);
 
   const handleUpload = async () => {
     setError("");
@@ -67,8 +73,14 @@ const AddMenu = () => {
         createdAt: serverTimestamp(),
         modifiedAt: serverTimestamp(),
       });
-
-      alert("Item added successfully!");
+      toast.success("Item has been added!", {
+        unstyled: true,
+        classNames: {
+          toast: "bg-white rounded-xl p-5",
+          title: "text-green-300 text-xl",
+          success: "text-[#8FBC8B]",
+        },
+      });
       setItem({
         category: "",
         name: "",
@@ -91,8 +103,9 @@ const AddMenu = () => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Navbar active="menu" />
-
+      <button onClick={onClose}>Close</button>
+      {/*       <Navbar active="menu" />
+       */}
       <div className="flex flex-col items-center mt-20">
         <div className="w-full max-w-md bg-white p-6 shadow-md rounded-md">
           <h2 className="text-2xl font-semibold mb-6">Add Menu Item</h2>
@@ -223,6 +236,21 @@ const AddMenu = () => {
             >
               {loading ? "Uploading..." : "Add Item"}
             </button>
+            <button
+              onClick={() =>
+                toast.success("Item has been added!", {
+                  unstyled: true,
+                  classNames: {
+                    toast: "bg-white rounded-xl p-5",
+                    title: "text-green-300 text-xl",
+                    success: "text-[#8FBC8B]",
+                  },
+                })
+              }
+            >
+              toast
+            </button>
+            <Toaster />
           </div>
         </div>
       </div>

@@ -25,7 +25,7 @@ const Login = () => {
   useEffect(() => {
     // Check login state and redirect if user is logged in
     onAuthStateChanged(auth, (user) => {
-      if (user) navigate("/menu"); // Redirect to menu page on login
+      if (user) navigate("/"); // Redirect to menu page on login
     });
   }, [navigate]);
 
