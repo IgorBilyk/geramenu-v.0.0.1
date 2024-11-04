@@ -14,7 +14,6 @@ const QRPage = () => {
     setUserId(storedUserId);
   }, []);
 
-  // Function to generate a PDF with the QR code
   const generatePDF = () => {
     const qrCodeSVG = qrRef.current.querySelector("svg");
     const svgData = new XMLSerializer().serializeToString(qrCodeSVG);
@@ -36,7 +35,6 @@ const QRPage = () => {
     img.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
 
-  // Function to print the QR code
   const printQRCode = () => {
     const qrCodeSVG = qrRef.current.querySelector("svg");
     const svgData = new XMLSerializer().serializeToString(qrCodeSVG);
@@ -100,19 +98,15 @@ const QRPage = () => {
           </button>
           <FacebookShareButton
             url={`https://yourapp.com/previewext/${userId}`}
-            className="inline-block"
+            className="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800 inline-block"
           >
-            <button className="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800">
-              Share on Facebook
-            </button>
+            Share on Facebook
           </FacebookShareButton>
           <TwitterShareButton
             url={`https://yourapp.com/previewext/${userId}`}
-            className="inline-block"
+            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 inline-block"
           >
-            <button className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">
-              Share on Twitter
-            </button>
+            Share on Twitter
           </TwitterShareButton>
         </div>
       </div>
