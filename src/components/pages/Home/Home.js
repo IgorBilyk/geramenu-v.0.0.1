@@ -1,13 +1,32 @@
 import { useState, useEffect, useRef } from "react";
 import { db } from "../../../firebase/firebase";
 import { auth } from "../../../firebase/firebase";
-import { collection, query, where, onSnapshot, doc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  onSnapshot,
+  doc,
+  deleteDoc,
+} from "firebase/firestore";
 import { Toaster, toast } from "sonner";
 import { useParams } from "react-router-dom";
 import Navbar from "../../ui/Navbar";
 import { FaArrowUp, FaEdit, FaTrash } from "react-icons/fa";
 import AddMenu from "../AddMenu/AddMenu";
-import Button from "../../ui/Button";
+import CustomButton from "../../ui/Button";
+
+import {
+  Card,
+  CardHeader,
+  CardBody,
+  CardFooter,
+  Typography,
+  Tooltip,
+  IconButton,
+  Button as btn,
+  Button
+} from "@material-tailwind/react";
 
 const Home = () => {
   const { userId } = useParams();
@@ -31,7 +50,9 @@ const Home = () => {
       }));
       setItems(menuItems);
 
-      const uniqueCategories = [...new Set(menuItems.map((item) => item.category))];
+      const uniqueCategories = [
+        ...new Set(menuItems.map((item) => item.category)),
+      ];
       setCategories(uniqueCategories);
     });
 
@@ -47,7 +68,9 @@ const Home = () => {
   };
 
   const handleScroll = () => {
-    const categoryElements = categories?.map((category) => categoryRefs?.current[category]);
+    const categoryElements = categories?.map(
+      (category) => categoryRefs?.current[category]
+    );
     categoryElements.forEach((element, index) => {
       const bounding = element.getBoundingClientRect();
       if (bounding.top >= 0 && bounding.top <= window.innerHeight / 2) {
@@ -102,7 +125,7 @@ const Home = () => {
         <div className="container mx-auto pt-20">
           <div className="flex justify-between items-center mb-8">
             <h1 className="text-4xl font-bold">Menu</h1>
-            <Button title="Add Item" onPress={openModal} />
+            <CustomButton title="Add Item" onPress={openModal} />
           </div>
 
           {items.length === 0 && <p>No Items</p>}
@@ -115,40 +138,53 @@ const Home = () => {
                 className="my-8"
               >
                 {/* Update grid here */}
-                <div /* className="grid grid-cols-1 md:grid-cols-2 gap-2" */ className="">
+                <div
+                  className="flex justify-center"
+                >
                   {items
                     .filter((item) => item.category === category)
                     .map((item) => (
-                      <div key={item.id} className="border p-4 shadow rounded">
-                        <div className="relative">
-                          <div className="flex justify-between mb-3">
-                            <FaEdit
-                              onClick={() => openModal(item)}
-                              className="text-gray-700 cursor-pointer"
-                            />
-                            <FaTrash
-                              onClick={() => handleDeleteItem(item.id)}
-                              className="text-red-500 cursor-pointer"
-                            />
-                          </div>
-                          <div className="w-full h-48 overflow-hidden rounded-lg">
-                            <img
-                              src={item.image}
-                              alt={item.name}
-                              className="object-cover w-full h-full"
-                            />
-                          </div>
+                  
+                      <Card className="w-96">
+                      <CardHeader shadow={false} floated={false} className="h-96">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="h-full w-full object-cover"
+                        />
+                      </CardHeader>
+                      <CardBody>
+                        <div className="mb-2 flex items-center justify-between">
+                          <Typography color="blue-gray" className="font-medium">
+                            {item.name}
+                          </Typography>
+                          <Typography color="blue-gray" className="font-medium">
+                          {item.price}&#8364;	
+                          </Typography>
                         </div>
-                        <h3 className="text-xl font-semibold mt-4">{item.name}</h3>
-                        <p>{item.description}</p>
-                        <p className="font-bold">${item.price}</p>
-                      </div>
+                        <Typography
+                          variant="small"
+                          color="gray"
+                          className="font-normal opacity-75"
+                        >
+                         {item.description}
+                        </Typography>
+                      </CardBody>
+                      <CardFooter className="pt-0">
+                      {/*   <Button
+                          ripple={false}
+                          fullWidth={true}
+                          className="bg-blue-gray-900/10 text-blue-gray-900 shadow-none hover:scale-105 hover:shadow-none focus:scale-105 focus:shadow-none active:scale-100"
+                        >
+                          Add to Cart
+                        </Button> */}
+                      </CardFooter>
+                    </Card>
                     ))}
                 </div>
               </div>
             ))}
           </div>
-
         </div>
 
         <button
@@ -158,7 +194,7 @@ const Home = () => {
           <FaArrowUp />
         </button>
         <Toaster />
-        
+
         {isModalOpen && (
           <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
             <div className="bg-white p-6 rounded shadow-lg max-w-md w-full">
@@ -167,6 +203,8 @@ const Home = () => {
           </div>
         )}
       </div>
+      
+      
     </div>
   );
 };
