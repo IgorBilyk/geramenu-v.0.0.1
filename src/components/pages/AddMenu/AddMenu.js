@@ -28,7 +28,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
   const [error, setError] = useState("");
 
   const handleAddVariant = () => {
-    setVariants([...variants, { name: "", price: "", quantity: "" }]);
+    setVariants([...variants, { name: "", price: "", quantity: "", unit: "pcs" }]);
   };
 
   const handleRemoveVariant = (index) => {
@@ -43,7 +43,6 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
 
   useEffect(() => {
     if (itemToEdit) {
-      // Set default values for missing fields in itemToEdit to prevent undefined values
       setItem({
         category: itemToEdit.category || "",
         name: itemToEdit.name || "",
@@ -62,7 +61,6 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
   const handleUpload = async () => {
     setError("");
 
-    // Validation
     if (!item.category || !item.name || !item.price || !item.description) {
       setError("Please fill out all required fields.");
       return;
@@ -71,7 +69,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
       setError("Please upload an image.");
       return;
     }
-    if (variants.some((v) => !v.price || !v.quantity)) {
+    if (variants.some((v) => !v.name || !v.price || !v.quantity)) {
       setError("Please fill out all variant fields.");
       return;
     }
@@ -136,10 +134,11 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
 
   return (
     <div className="min-h-screen bg-gray-100">
-      <Button title="Close" styles="bg-red-500 m-4" onPress={onClose}/>
+      <Button title="Close" styles="bg-red-500 m-4" onPress={onClose} />
 
       <div className="flex flex-col items-center mt-20">
-        <div className="w-full max-w-md bg-white p-6 shadow-md rounded-md">
+        {/* Modal container with scrollable content */}
+        <div className="w-full max-w-md bg-white p-6 shadow-md rounded-md max-h-[80vh] overflow-y-auto">
           <h2 className="text-2xl font-semibold mb-6">Add Menu Item</h2>
           {error && <p className="text-red-500 mb-4 p-1">{error}</p>}
 
@@ -168,9 +167,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
             <textarea
               placeholder="Description"
               value={item.description || ""}
-              onChange={(e) =>
-                setItem({ ...item, description: e.target.value })
-              }
+              onChange={(e) => setItem({ ...item, description: e.target.value })}
               className="w-full p-3 border rounded-md"
             ></textarea>
             <input
@@ -209,7 +206,67 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
               </select>
             </div>
 
-            {/* Variants handling omitted for brevity */}
+            <div>
+              <h3 className="text-xl font-semibold mt-4">Variants</h3>
+              {variants.map((variant, index) => (
+                <div key={index} className="flex flex-col mt-2">
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Variant Name"
+                      value={variant.name}
+                      onChange={(e) =>
+                        handleVariantChange(index, "name", e.target.value)
+                      }
+                      className="w-full p-2 border rounded-md my-2"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Price"
+                      value={variant.price}
+                      onChange={(e) =>
+                        handleVariantChange(index, "price", e.target.value)
+                      }
+                      className="w-full p-2 border rounded-md"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="number"
+                      placeholder="Quantity"
+                      value={variant.quantity}
+                      onChange={(e) =>
+                        handleVariantChange(index, "quantity", e.target.value)
+                      }
+                      className="w-full p-2 border rounded-md my-2"
+                    />
+                    <select
+                      value={variant.unit || "pcs"}
+                      onChange={(e) =>
+                        handleVariantChange(index, "unit", e.target.value)
+                      }
+                      className="p-2 border rounded-md my-2"
+                    >
+                      <option value="pcs">pcs</option>
+                      <option value="g">g</option>
+                      <option value="ml">ml</option>
+                    </select>
+                  </div>
+                  <button
+                    onClick={() => handleRemoveVariant(index)}
+                    className="bg-red-500 text-white p-2 rounded-md w-[30%] my-2"
+                  >
+                    Remove
+                  </button>
+                </div>
+              ))}
+              <button
+                onClick={handleAddVariant}
+                className="w-full py-2 mt-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              >
+                Add Variant
+              </button>
+            </div>
 
             <button
               onClick={handleUpload}

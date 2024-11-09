@@ -86,8 +86,10 @@ const Settings = () => {
       <Navbar />
       <div className="flex justify-center items-center flex-col">
         <h2 className="text-2xl font-bold my-20">Restaurant Settings</h2>
-        <form onSubmit={handleSubmit} className="space-y-4 w-[100%] sm:w-[60%] p-4">
-     
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-4 w-[100%] sm:w-[60%] p-4"
+        >
           <div>
             <label className="block mb-2">Restaurant Name:</label>
             <input
@@ -131,6 +133,7 @@ const Settings = () => {
           <div>
             <label className="block mb-2">Working Hours:</label>
             <div className="space-y-2">
+              <span>From</span>
               <input
                 type="time"
                 name="open"

@@ -77,7 +77,7 @@ const QRPage = () => {
         {userId && (
           <div ref={qrRef} className="bg-white p-6 rounded-lg shadow-lg">
             <QRCodeSVG
-              value={`https://yourapp.com/previewext/${userId}`}
+              value={`https://www.google.com/search?q=${userId}`}
               size={200}
             />
           </div>
