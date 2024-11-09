@@ -1,32 +1,14 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { db } from "../../../firebase/firebase";
 import { collection, query, where, getDocs } from "firebase/firestore";
 import { useParams } from "react-router-dom";
-import {
-  FaArrowUp,
-  FaFish,
-  FaDrumstickBite,
-  FaCarrot,
-  FaLeaf,
-} from "react-icons/fa";
-
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Typography,
-  Tooltip,
-  IconButton,
-  Button,
-} from "@material-tailwind/react";
+import { FaArrowUp, FaFish, FaDrumstickBite, FaCarrot, FaLeaf } from "react-icons/fa";
 
 const PreviewExternalPage = () => {
   const { userId } = useParams(); // Extract user ID from URL
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState("");
-  const categoryRefs = useRef({});
   const topRef = useRef(null);
 
   // Map categories to icons
@@ -43,7 +25,10 @@ const PreviewExternalPage = () => {
       const itemsRef = collection(db, "menuItems");
       const q = query(itemsRef, where("userId", "==", userId));
       const querySnapshot = await getDocs(q);
-      const menuItems = querySnapshot.docs.map((doc) => doc.data());
+      const menuItems = querySnapshot.docs.map((doc) => ({
+        id: doc.id, // Use document ID as a unique key
+        ...doc.data(),
+      }));
 
       setItems(menuItems);
 
@@ -51,36 +36,19 @@ const PreviewExternalPage = () => {
         ...new Set(menuItems.map((item) => item.category)),
       ];
       setCategories(uniqueCategories);
+
+      // Set initial active category to the first one, if available
+      if (uniqueCategories.length > 0) {
+        setActiveCategory(uniqueCategories[0]);
+      }
     };
 
     fetchItems();
   }, [userId]);
 
   const handleScrollToCategory = (category) => {
-    const element = categoryRefs?.current[category];
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth" });
-    }
-    setActiveCategory(category);
+    setActiveCategory(category); // Update active category directly
   };
-
-  const handleScroll = () => {
-    const categoryElements = categories?.map(
-      (category) => categoryRefs?.current[category]
-    );
-
-    categoryElements.forEach((element, index) => {
-      const bounding = element.getBoundingClientRect();
-      if (bounding.top >= 0 && bounding.top <= window.innerHeight / 2) {
-        setActiveCategory(categories[index]);
-      }
-    });
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [categories]);
 
   const scrollToTop = () => {
     topRef.current.scrollIntoView({ behavior: "smooth" });
@@ -89,11 +57,12 @@ const PreviewExternalPage = () => {
   return (
     <div>
       <div ref={topRef}>
-        <nav className="fixed top-20 left-0 w-full bg-white shadow-lg z-10">
+        {/* Navbar with category buttons */}
+        <nav className="fixed top-0 left-0 w-full z-10 bg-gray-300">
           <div className="flex justify-center space-x-4 py-3">
             {categories.map((category) => (
               <button
-                key={category}
+                key={category} // Ensure unique key for each category button
                 onClick={() => handleScrollToCategory(category)}
                 className={`px-4 py-2 rounded-full ${
                   activeCategory === category
@@ -107,109 +76,44 @@ const PreviewExternalPage = () => {
           </div>
         </nav>
 
+        {/* Content displaying items from only the active category */}
         <div className="container mx-auto pt-20 mt-20">
           <h1 className="text-4xl font-bold mb-8">Menu</h1>
-          {categories.map((category) => (
-            <div
-              key={category}
-              ref={(el) => (categoryRefs.current[category] = el)}
-            >
-              <h2 className="text-2xl font-bold mb-4">{category}</h2>
+          {activeCategory && (
+            <div>
+              <h2 className="text-2xl font-bold mb-4">{activeCategory}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {items
-                  ?.filter((item) => item.category === category)
-                  ?.map((item, index) => (
-                    <Card className="w-96" key={item.id}>
-                      <CardHeader
-                        shadow={false}
-                        floated={false}
-                        className="h-96"
-                      >
+                  .filter((item) => item.category === activeCategory)
+                  .map((item) => (
+                    <div key={item.id} className="border p-4 shadow rounded">
+                      <div className="w-full h-60 overflow-hidden rounded-lg">
                         <img
-                          src={item.image}
+                          src={`${item.image}`}
                           alt={item.name}
-                          className="h-full w-full object-cover"
+                          className="object-cover w-full h-full"
                         />
-                      </CardHeader>
-                      <CardBody>
-                        <div className="mb-2 flex items-center justify-between border-b-2">
-                          <Typography color="blue-gray" className="font-medium">
-                            {item.name}
-                          </Typography>
-                          <div>
-                            <Typography
-                              color="blue-gray"
-                              className="font-medium"
-                            >
-                              {item.price}&#8364;
-                            </Typography>
-                            <div className="flex">
-                              <Typography
-                                color="blue-gray"
-                                className="font-small mr-2"
-                              >
-                                {item.quantity}
-                              </Typography>
-                              <Typography
-                                color="blue-gray"
-                                className="font-small"
-                              >
-                                {item.unit}
-                              </Typography>
-                            </div>
-                          </div>
-                        </div>
+                      </div>
+                      <h3 className="text-xl font-semibold mt-4">{item.name}</h3>
+                      <p>{item.description}</p>
+                      <p className="font-bold">${item.price}</p>
 
-                        {/* Conditionally render variants */}
-                        {item.variants && item.variants.length > 0 && (
-                          <div className="mt-4">
-                            <Typography
-                              color="blue-gray"
-                              className="font-medium mb-2"
-                            >
-                              Variants:
-                            </Typography>
-                            <div>
-                              {item.variants.map((variant, index) => (
-                                <div
-                                  key={index}
-                                  className="flex justify-between mb-2"
-                                >
-                                  <Typography
-                                    color="gray"
-                                    className="font-normal"
-                                  >
-                                    {variant.name}
-                                  </Typography>
-                                  <Typography
-                                    color="gray"
-                                    className="font-normal"
-                                  >
-                                    {variant.price}&#8364; - {variant.quantity}{" "}
-                                    {variant.unit}
-                                  </Typography>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+                      {/* Category Icon at the bottom */}
+                      <div className="flex justify-end mt-4">
+                        {categoryIcons[activeCategory] && (
+                          <span className="text-2xl text-gray-500">
+                            {React.createElement(categoryIcons[activeCategory])}
+                          </span>
                         )}
-                        {item.description && (
-                          <Typography
-                            variant="small"
-                            color="gray"
-                            className="font-normal opacity-75"
-                          >
-                            {item.description}
-                          </Typography>
-                        )}
-                      </CardBody>
-                    </Card>
+                      </div>
+                    </div>
                   ))}
               </div>
             </div>
-          ))}
+          )}
         </div>
 
+        {/* Scroll-to-top button */}
         <button
           onClick={scrollToTop}
           className="fixed bottom-4 right-4 p-3 rounded-full bg-blue-500 text-white shadow-lg hover:bg-blue-600"
