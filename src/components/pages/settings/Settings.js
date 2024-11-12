@@ -3,6 +3,11 @@ import { db, storage, auth } from "../../../firebase/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import Navbar from "../../ui/Navbar";
+import { successMessage, warningMessage } from "../../../handlers/toastHandler";
+
+import { Toaster } from "sonner";
+
+
 const Settings = () => {
   const [formData, setFormData] = useState({
     restaurantName: "",
@@ -10,8 +15,10 @@ const Settings = () => {
     phone: "",
     email: "",
     workingHours: {
-      open: "",
-      close: "",
+      lunchOpen: "",
+      lunchClose: "",
+      dinnerOpen: "",
+      dinnerClose: "",
       closedDays: [],
     },
     description: "",
@@ -66,32 +73,35 @@ const Settings = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
+    try {
+      let imageUrl = formData.imageUrl;
+      if (imageFile) {
+        const imageRef = ref(storage, `restaurants/${userId}/image.jpg`);
+        await uploadBytes(imageRef, imageFile);
+        imageUrl = await getDownloadURL(imageRef);
+      }
 
-    let imageUrl = formData.imageUrl;
-    if (imageFile) {
-      const imageRef = ref(storage, `restaurants/${userId}/image.jpg`);
-      await uploadBytes(imageRef, imageFile);
-      imageUrl = await getDownloadURL(imageRef);
+      await setDoc(doc(db, "restaurants", userId), {
+        ...formData,
+        imageUrl,
+      });
+      successMessage('Restaurant info has been added!')
+    } catch (error) {
+      warningMessage('Something went wrong, pleae try again!')
     }
-
-    await setDoc(doc(db, "restaurants", userId), {
-      ...formData,
-      imageUrl,
-    });
-    alert("Settings updated successfully!");
   };
 
   return (
     <div className="bg-gray-100 min-h-screen">
       <Navbar />
       <div className="flex justify-center items-center flex-col">
-        <h2 className="text-2xl font-bold my-20">Restaurant Settings</h2>
+        <h2 className="text-2xl font-bold my-20">Meu Restaurante</h2>
         <form
           onSubmit={handleSubmit}
-          className="space-y-4 w-[100%] sm:w-[60%] p-4"
+          className="space-y-4 w-full sm:w-2/3 p-6 bg-white shadow-md rounded-md"
         >
           <div>
-            <label className="block mb-2">Restaurant Name:</label>
+            <label className="block mb-2">Restaurant Nome:</label>
             <input
               type="text"
               name="restaurantName"
@@ -101,7 +111,7 @@ const Settings = () => {
             />
           </div>
           <div>
-            <label className="block mb-2">Address:</label>
+            <label className="block mb-2">Morada:</label>
             <input
               type="text"
               name="address"
@@ -111,7 +121,7 @@ const Settings = () => {
             />
           </div>
           <div>
-            <label className="block mb-2">Phone:</label>
+            <label className="block mb-2">Número:</label>
             <input
               type="text"
               name="phone"
@@ -131,50 +141,71 @@ const Settings = () => {
             />
           </div>
           <div>
-            <label className="block mb-2">Working Hours:</label>
-            <div className="space-y-2">
-              <span>From</span>
+            <label className="block mb-2 font-bold">Horário:</label>
+            <h3>Almoço:</h3>
+            <div className="flex gap-4">
               <input
                 type="time"
-                name="open"
-                value={formData.workingHours.open}
+                name="lunchOpen"
+                value={formData.workingHours.lunchOpen}
                 onChange={handleWorkingHoursChange}
-                className="px-4 py-2 border rounded-md mr-4"
+                className="p-2 border rounded-md"
               />
+              <span>as</span>
               <input
                 type="time"
-                name="close"
-                value={formData.workingHours.close}
+                name="lunchClose"
+                value={formData.workingHours.lunchClose}
                 onChange={handleWorkingHoursChange}
-                className="px-4 py-2 border rounded-md"
+                className="p-2 border rounded-md"
+              />
+            </div>
+            <h3 className="mt-4">Jantar:</h3>
+            <div className="flex gap-4">
+              <input
+                type="time"
+                name="dinnerOpen"
+                value={formData.workingHours.dinnerOpen}
+                onChange={handleWorkingHoursChange}
+                className="p-2 border rounded-md"
+              />
+              <span>as</span>
+              <input
+                type="time"
+                name="dinnerClose"
+                value={formData.workingHours.dinnerClose}
+                onChange={handleWorkingHoursChange}
+                className="p-2 border rounded-md"
               />
             </div>
           </div>
           <div>
-            <label className="block mb-2">Closed Days:</label>
-            {[
-              "Sunday",
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
-              "Saturday",
-            ].map((day) => (
-              <label key={day} className="inline-flex items-center mr-4">
-                <input
-                  type="checkbox"
-                  value={day}
-                  checked={formData.workingHours.closedDays.includes(day)}
-                  onChange={handleClosedDaysChange}
-                  className="mr-2"
-                />
-                {day}
-              </label>
-            ))}
+            <label className="block mb-2">Encerrado:</label>
+            <div className="flex flex-wrap gap-2">
+              {[
+                "Sunday",
+                "Monday",
+                "Tuesday",
+                "Wednesday",
+                "Thursday",
+                "Friday",
+                "Saturday",
+              ].map((day) => (
+                <label key={day} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    value={day}
+                    checked={formData.workingHours.closedDays.includes(day)}
+                    onChange={handleClosedDaysChange}
+                    className="h-4 w-4 text-blue-500 border-gray-300 rounded"
+                  />
+                  <span className="text-sm font-medium">{day}</span>
+                </label>
+              ))}
+            </div>
           </div>
           <div>
-            <label className="block mb-2">Description:</label>
+            <label className="block mb-2">Descrição:</label>
             <textarea
               name="description"
               value={formData.description}
@@ -184,7 +215,7 @@ const Settings = () => {
             ></textarea>
           </div>
           <div>
-            <label className="block mb-2">Upload Image (optional):</label>
+            <label className="block mb-2">Imagem (opcional):</label>
             <input
               type="file"
               onChange={(e) => setImageFile(e.target.files[0])}
@@ -195,8 +226,9 @@ const Settings = () => {
             type="submit"
             className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
           >
-            Save Settings
+            Guardar
           </button>
+          <Toaster />
         </form>
       </div>
     </div>

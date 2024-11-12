@@ -9,23 +9,20 @@ import {
   doc,
   deleteDoc,
 } from "firebase/firestore";
-import { Toaster, toast } from "sonner";
+import { Toaster } from "sonner";
 import { useParams } from "react-router-dom";
 import Navbar from "../../ui/Navbar";
-import { FaArrowUp, FaEdit, FaTrash } from "react-icons/fa";
+import { FaArrowUp} from "react-icons/fa";
 import AddMenu from "../AddMenu/AddMenu";
 import CustomButton from "../../ui/Button";
-
 import {
   Card,
   CardHeader,
   CardBody,
-  CardFooter,
   Typography,
-  Tooltip,
-  IconButton,
-  Button,
+
 } from "@material-tailwind/react";
+import { successMessage } from "../../../handlers/toastHandler";
 
 const Home = () => {
   const { userId } = useParams();
@@ -66,24 +63,13 @@ const Home = () => {
     setActiveCategory(category);
   };
 
-  const handleScroll = () => {
-    const categoryElements = categories?.map(
-      (category) => categoryRefs?.current[category]
-    );
-    categoryElements.forEach((element, index) => {
-      const bounding = element.getBoundingClientRect();
-      if (bounding.top >= 0 && bounding.top <= window.innerHeight / 2) {
-        setActiveCategory(categories[index]);
-      }
-    });
-  };
-
   const scrollToTop = () => {
     topRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
   const openModal = (item = null) => {
     setSelectedItem(item);
+    console.log("Open Modal",item)
     setIsModalOpen(true);
   };
 
@@ -95,23 +81,15 @@ const Home = () => {
   const handleDeleteItem = async (itemId) => {
     if (window.confirm("Are you sure you want to delete this item?")) {
       await deleteDoc(doc(db, "menuItems", itemId));
-      toast.success("Item has been deleted!");
+      successMessage('Item has been deleted!')
     }
   };
-
-  useEffect(() => {
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, [categories]);
 
   return (
     <div>
       <div ref={topRef}>
-        <div className="sticky top-0 z-10">
+        <div className="sticky top-0 z-10 ">
           <Navbar />
-          {/* Sticky Navbar with categories */}
           <nav className="sticky top-[64px] z-40 bg-gray-800 shadow-lg px-4 py-2">
             <div className="flex flex-wrap justify-center gap-2 md:gap-4 py-3">
               {categories.map((category) => (
@@ -129,10 +107,9 @@ const Home = () => {
               ))}
             </div>
           </nav>
-          {/* Menu Section */}
-          <div className="container mx-auto pt-20">
+          <div className="container mx-auto pt-2">
             <div className="flex justify-end items-center mb-8">
-              <CustomButton title="Add Item" onPress={openModal}/>
+              <CustomButton title="Add Item" onPress={() => openModal()} />
             </div>
           </div>
         </div>
@@ -147,17 +124,12 @@ const Home = () => {
               ref={(el) => (categoryRefs.current[category] = el)}
               className="my-8"
             >
-              {/* Display items based on category */}
-              <div className="flex justify-center">
+              <div className="flex justify-center items-center flex-col">
                 {items
                   .filter((item) => item.category === category)
                   .map((item) => (
                     <Card className="w-96" key={item.id}>
-                      <CardHeader
-                        shadow={false}
-                        floated={false}
-                        className="h-96"
-                      >
+                      <CardHeader shadow={false} floated={false} className="h-96">
                         <img
                           src={item.image}
                           alt={item.name}
@@ -170,72 +142,57 @@ const Home = () => {
                             {item.name}
                           </Typography>
                           <div>
-                            <Typography
-                              color="blue-gray"
-                              className="font-medium"
-                            >
+                            <Typography color="blue-gray" className="font-medium">
                               {item.price}&#8364;
                             </Typography>
                             <div className="flex">
-                              <Typography
-                                color="blue-gray"
-                                className="font-small mr-2"
-                              >
+                              <Typography color="blue-gray" className="font-small mr-2">
                                 {item.quantity}
                               </Typography>
-                              <Typography
-                                color="blue-gray"
-                                className="font-small"
-                              >
+                              <Typography color="blue-gray" className="font-small">
                                 {item.unit}
                               </Typography>
                             </div>
                           </div>
                         </div>
 
-                        {/* Conditionally render variants */}
                         {item.variants && item.variants.length > 0 && (
                           <div className="mt-4">
-                            <Typography
-                              color="blue-gray"
-                              className="font-medium mb-2"
-                            >
+                            <Typography color="blue-gray" className="font-medium mb-2">
                               Variants:
                             </Typography>
                             <div>
                               {item.variants.map((variant, index) => (
-                                <div
-                                  key={index}
-                                  className="flex justify-between mb-2"
-                                >
-                                  <Typography
-                                    color="gray"
-                                    className="font-normal"
-                                  >
+                                <div key={index} className="flex justify-between mb-2">
+                                  <Typography color="gray" className="font-normal">
                                     {variant.name}
                                   </Typography>
-                                  <Typography
-                                    color="gray"
-                                    className="font-normal"
-                                  >
-                                    {variant.price}&#8364; - {variant.quantity}{" "}
-                                    {variant.unit}
+                                  <Typography color="gray" className="font-normal">
+                                    {variant.price}&#8364; - {variant.quantity} {variant.unit}
                                   </Typography>
                                 </div>
                               ))}
                             </div>
                           </div>
                         )}
+
                         {item.description && (
-                          <Typography
-                            variant="small"
-                            color="gray"
-                            className="font-normal opacity-75"
-                          >
+                          <Typography variant="small" color="gray" className="font-normal opacity-75">
                             {item.description}
                           </Typography>
                         )}
                       </CardBody>
+                      <div className="flex justify-around gap-4 pb-4">
+                        <CustomButton title="Edit"  onPress={()=> openModal(item)}/>
+                        <CustomButton title="Remove"  onPress={()=> handleDeleteItem(item?.id)} styles="bg-red-500"/>
+              
+                        {/* <IconButton onClick={() => openModal(item)}>
+                          <FaEdit className="text-blue-500" />
+                        </IconButton>
+                        <IconButton onClick={() => handleDeleteItem(item.id)}>
+                          <FaTrash className="text-red-500" />
+                        </IconButton> */}
+                      </div>
                     </Card>
                   ))}
               </div>
@@ -244,7 +201,6 @@ const Home = () => {
         </div>
       </div>
 
-      {/* Scroll to Top Button */}
       <button
         onClick={scrollToTop}
         className="fixed bottom-4 right-4 p-3 rounded-full bg-blue-500 text-white shadow-lg hover:bg-blue-600"
@@ -253,7 +209,6 @@ const Home = () => {
       </button>
       <Toaster />
 
-      {/* Modal for Add Item */}
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded shadow-lg max-w-md w-full">

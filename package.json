@@ -19,6 +19,7 @@
     "react-router-dom": "^6.27.0",
     "react-scripts": "5.0.1",
     "react-share": "^5.1.0",
+    "react-time-picker-input": "^2.2.4",
     "sonner": "^1.6.1",
     "web-vitals": "^2.1.4"
   },
@@ -49,5 +50,4 @@
   "devDependencies": {
     "tailwindcss": "^3.4.14"
   }
-  
 }

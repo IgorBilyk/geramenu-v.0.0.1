@@ -10,6 +10,7 @@ import {
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { Toaster, toast } from "sonner";
 import Button from "../../ui/Button";
+import { successMessage } from "../../../handlers/toastHandler";
 
 const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
   const [item, setItem] = useState({
@@ -61,7 +62,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
   const handleUpload = async () => {
     setError("");
 
-    if (!item.category || !item.name || !item.price || !item.description) {
+    if (!item.category || !item.name || !item.price ) {
       setError("Please fill out all required fields.");
       return;
     }
@@ -101,15 +102,8 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
       } else {
         await addDoc(collection(db, "menuItems"), itemData);
       }
+      successMessage()
 
-      toast.success("Item has been added!", {
-        unstyled: true,
-        classNames: {
-          toast: "bg-white rounded-xl p-5",
-          title: "text-green-300 text-xl",
-          success: "text-[#8FBC8B]",
-        },
-      });
       setItem({
         category: "",
         name: "",
@@ -203,6 +197,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
                 <option value="pcs">pcs</option>
                 <option value="g">g</option>
                 <option value="ml">ml</option>
+                <option value="persons">pessoas</option>
               </select>
             </div>
 
@@ -250,6 +245,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
                       <option value="pcs">pcs</option>
                       <option value="g">g</option>
                       <option value="ml">ml</option>
+                      <option value="persons">pessoas</option>
                     </select>
                   </div>
                   <button
