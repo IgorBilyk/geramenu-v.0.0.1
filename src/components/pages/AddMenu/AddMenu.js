@@ -12,7 +12,7 @@ import { Toaster, toast } from "sonner";
 import Button from "../../ui/Button";
 import { successMessage } from "../../../handlers/toastHandler";
 
-const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
+const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) => {
   const [item, setItem] = useState({
     category: "",
     name: "",
@@ -27,6 +27,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
   const [variants, setVariants] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [filteredCategories, setFilteredCategories] = useState([]);
 
   const handleAddVariant = () => {
     setVariants([...variants, { name: "", price: "", quantity: "", unit: "pcs" }]);
@@ -74,7 +75,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
       setError("Please fill out all variant fields.");
       return;
     }
-
+console.log('image from add Item',item.image)
     setLoading(true);
 
     try {
@@ -102,7 +103,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
       } else {
         await addDoc(collection(db, "menuItems"), itemData);
       }
-      successMessage()
+      successMessage("Item added successfully!");
 
       setItem({
         category: "",
@@ -126,40 +127,75 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
     }
   };
 
+  // Handle category input change with autocomplete
+  const handleCategoryChange = (e) => {
+    const input = e.target.value;
+    setItem({ ...item, category: input });
+
+    if (input) {
+      const filtered = availableCategories.filter((cat) =>
+        cat.toLowerCase().includes(input.toLowerCase())
+      );
+      setFilteredCategories(filtered);
+    } else {
+      setFilteredCategories([]);
+    }
+  };
+
+  const selectCategory = (category) => {
+    setItem({ ...item, category });
+    setFilteredCategories([]);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100">
       <Button title="Close" styles="bg-red-500 m-4" onPress={onClose} />
 
       <div className="flex flex-col items-center mt-20">
-        {/* Modal container with scrollable content */}
         <div className="w-full max-w-md bg-white p-6 shadow-md rounded-md max-h-[80vh] overflow-y-auto">
-          <h2 className="text-2xl font-semibold mb-6">Add Menu Item</h2>
+          <h2 className="text-2xl font-semibold mb-6">Adicionar Menu Item</h2>
           {error && <p className="text-red-500 mb-4 p-1">{error}</p>}
 
           <div className="space-y-4">
+            <div className="relative">
+              <input
+                type="text"
+                placeholder="Categoria"
+                value={item.category || ""}
+                onChange={handleCategoryChange}
+                className="w-full p-3 border rounded-md"
+              />
+              {filteredCategories.length > 0 && (
+                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto">
+                  {filteredCategories.map((cat, index) => (
+                    <li
+                      key={index}
+                      onClick={() => selectCategory(cat)}
+                      className="p-2 hover:bg-gray-200 cursor-pointer"
+                    >
+                      {cat}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+
             <input
               type="text"
-              placeholder="Category"
-              value={item.category || ""}
-              onChange={(e) => setItem({ ...item, category: e.target.value })}
-              className="w-full p-3 border rounded-md"
-            />
-            <input
-              type="text"
-              placeholder="Name"
+              placeholder="Nome"
               value={item.name || ""}
               onChange={(e) => setItem({ ...item, name: e.target.value })}
               className="w-full p-3 border rounded-md"
             />
             <input
               type="number"
-              placeholder="Price"
+              placeholder="Preço"
               value={item.price || ""}
               onChange={(e) => setItem({ ...item, price: e.target.value })}
               className="w-full p-3 border rounded-md"
             />
             <textarea
-              placeholder="Description"
+              placeholder="Descrição (Opcional)"
               value={item.description || ""}
               onChange={(e) => setItem({ ...item, description: e.target.value })}
               className="w-full p-3 border rounded-md"
@@ -169,22 +205,10 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
               onChange={(e) => setItem({ ...item, image: e.target.files[0] })}
               className="w-full p-3 border rounded-md"
             />
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                checked={item.outOfStock || false}
-                onChange={(e) =>
-                  setItem({ ...item, outOfStock: e.target.checked })
-                }
-                className="mr-2"
-              />
-              <label>Out of Stock</label>
-            </div>
-
-            <div className="flex space-x-2">
+                <div className="flex space-x-2">
               <input
                 type="number"
-                placeholder="Quantity"
+                placeholder="Quantidade"
                 value={item.quantity || ""}
                 onChange={(e) => setItem({ ...item, quantity: e.target.value })}
                 className="w-full p-3 border rounded-md"
@@ -197,72 +221,72 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
                 <option value="pcs">pcs</option>
                 <option value="g">g</option>
                 <option value="ml">ml</option>
-                <option value="persons">pessoas</option>
+                <option value="pessoas">pessoas</option>
               </select>
             </div>
-
-            <div>
-              <h3 className="text-xl font-semibold mt-4">Variants</h3>
-              {variants.map((variant, index) => (
-                <div key={index} className="flex flex-col mt-2">
-                  <div>
-                    <input
-                      type="text"
-                      placeholder="Variant Name"
-                      value={variant.name}
-                      onChange={(e) =>
-                        handleVariantChange(index, "name", e.target.value)
-                      }
-                      className="w-full p-2 border rounded-md my-2"
-                    />
-                    <input
-                      type="number"
-                      placeholder="Price"
-                      value={variant.price}
-                      onChange={(e) =>
-                        handleVariantChange(index, "price", e.target.value)
-                      }
-                      className="w-full p-2 border rounded-md"
-                    />
-                  </div>
-                  <div>
-                    <input
-                      type="number"
-                      placeholder="Quantity"
-                      value={variant.quantity}
-                      onChange={(e) =>
-                        handleVariantChange(index, "quantity", e.target.value)
-                      }
-                      className="w-full p-2 border rounded-md my-2"
-                    />
-                    <select
-                      value={variant.unit || "pcs"}
-                      onChange={(e) =>
-                        handleVariantChange(index, "unit", e.target.value)
-                      }
-                      className="p-2 border rounded-md my-2"
-                    >
-                      <option value="pcs">pcs</option>
-                      <option value="g">g</option>
-                      <option value="ml">ml</option>
-                      <option value="persons">pessoas</option>
-                    </select>
-                  </div>
-                  <button
-                    onClick={() => handleRemoveVariant(index)}
-                    className="bg-red-500 text-white p-2 rounded-md w-[30%] my-2"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ))}
-              <button
-                onClick={handleAddVariant}
-                className="w-full py-2 mt-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-              >
-                Add Variant
-              </button>
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                checked={item.outOfStock || false}
+                onChange={(e) =>
+                  setItem({ ...item, outOfStock: e.target.checked })
+                }
+                className="mr-2"
+              />
+              
+              <label>Não em Stock</label>
             </div>
+
+            <h3 className="text-xl font-semibold mt-4">Opções</h3>
+            {variants.map((variant, index) => (
+              <div key={index} className="border p-3 rounded-md mt-2 space-y-2">
+                <input
+                  type="text"
+                  placeholder="Nome"
+                  value={variant.name}
+                  onChange={(e) => handleVariantChange(index, "name", e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                />
+                <input
+                  type="number"
+                  placeholder="Preço"
+                  value={variant.price}
+                  onChange={(e) => handleVariantChange(index, "price", e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                />
+                <div className="flex">
+                  <input
+                    type="number"
+                    placeholder="Quantidade"
+                    value={variant.quantity}
+                    onChange={(e) => handleVariantChange(index, "quantity", e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                  />
+                  <select
+                    value={variant.unit}
+                    onChange={(e) => handleVariantChange(index, "unit", e.target.value)}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="pcs">pcs</option>
+                    <option value="g">g</option>
+                    <option value="ml">ml</option>
+                    <option value="pessoas">pessoas</option>
+                  </select>
+                </div>
+                <button
+                  onClick={() => handleRemoveVariant(index)}
+                  className="bg-red-500 text-white p-2 rounded-lg hover:underline text-sm mt-1"
+                >
+                  Remover Opção
+                </button>
+              </div>
+            ))}
+            <button
+              onClick={handleAddVariant}
+              className="w-full mt-3 bg-green-500 text-white rounded-md py-2"
+            >
+              + Adicionar Opção
+            </button>
 
             <button
               onClick={handleUpload}
@@ -271,7 +295,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems }) => {
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              {loading ? "Uploading..." : "Add Item"}
+              {loading ? "Uploading..." : "Adicionar Item"}
             </button>
 
             <Toaster />

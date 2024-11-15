@@ -28,45 +28,23 @@ const QRPage = () => {
 
       const pdf = new jsPDF();
       pdf.text("Scan the QR Code to view the menu:", 10, 10);
-      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 15, 40, 180, 160);
+
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 20, 20, 65, 65);
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 125, 20, 65, 65);
+
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 20, 95, 65, 65);
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 125, 95, 65, 65);
+
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 20, 175, 65, 65);
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 125, 175, 65, 65);
+
+
       pdf.save("menu.pdf");
     };
 
     img.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
 
-  const printQRCode = () => {
-    const qrCodeSVG = qrRef.current.querySelector("svg");
-    const svgData = new XMLSerializer().serializeToString(qrCodeSVG);
-    const canvas = document.createElement("canvas");
-    const ctx = canvas.getContext("2d");
-    const img = new Image();
-
-    img.onload = function () {
-      canvas.width = img.width;
-      canvas.height = img.height;
-      ctx.drawImage(img, 0, 0);
-
-      const dataUrl = canvas.toDataURL("image/png");
-      const printWindow = window.open("", "_blank");
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>Print QR Code</title>
-          </head>
-          <body>
-            <img src="${dataUrl}" style="width: 200px; height: 200px;" />
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-      printWindow.focus();
-      printWindow.print();
-      printWindow.close();
-    };
-
-    img.src = "data:image/svg+xml;base64," + btoa(svgData);
-  };
 
   return (
     <div className="flex flex-col min-h-screen bg-gray-100">
@@ -78,24 +56,19 @@ const QRPage = () => {
           <div ref={qrRef} className="bg-white p-6 rounded-lg shadow-lg">
             <QRCodeSVG
               value={`https://www.google.com/search?q=${userId}`}
-              size={200}
+              size={300}
             />
           </div>
         )}
         
-        <div className="mt-4 space-x-4">
+        <div className="flex flex-wrap m-4 space-x-4 justify-center items-arround">
           <button
             onClick={generatePDF}
             className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
           >
             Download PDF
           </button>
-          <button
-            onClick={printQRCode}
-            className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
-          >
-            Print QR Code
-          </button>
+      
           <FacebookShareButton
             url={`https://yourapp.com/previewext/${userId}`}
             className="bg-blue-700 text-white px-4 py-2 rounded-md hover:bg-blue-800 inline-block"

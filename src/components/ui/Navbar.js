@@ -6,7 +6,7 @@ import {
   MenuItems,
   MenuItem,
 } from "@headlessui/react";
-import { Bars3Icon, BellIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/firebase";
@@ -17,7 +17,7 @@ const Navbar = ({ active }) => {
   const [navigation] = useState([
     {
       name: "Preview",
-      href: `/`,
+      href: `/previewext/279kqLcgPlgbewcN0rRQyI6B01i2`,
       current: active === "preview",
     },
     {
