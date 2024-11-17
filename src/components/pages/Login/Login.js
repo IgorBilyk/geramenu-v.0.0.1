@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
-
+/* import Х from './assets/images/QR_bg.jpg'
+ */
 import { auth, db } from "../../../firebase/firebase";
 import {
   createUserWithEmailAndPassword,
@@ -31,8 +32,8 @@ const Login = () => {
 
   const handleLoginOrSignup = async (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
-    setIsLoading(true); // Set loading state
+    setError(""); 
+    setIsLoading(true); 
 
     try {
       if (isNewUser) {
@@ -48,7 +49,7 @@ const Login = () => {
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
           email: user.email,
-          createdAt: serverTimestamp(), // Store timestamp
+          createdAt: serverTimestamp(), 
         });
 
         setItem("userID", user.uid);
@@ -63,14 +64,14 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Error:", error.message);
-      setError(error.message); // Set error message
+      setError(error.message); 
     } finally {
-      setIsLoading(false); // Remove loading state
+      setIsLoading(false); 
     }
   };
 
   const handleGoogleSignIn = async () => {
-    setError(""); // Clear previous errors
+    setError(""); 
     setIsLoading(true);
     const provider = new GoogleAuthProvider();
     try {
@@ -92,7 +93,7 @@ const Login = () => {
       setItem("userID", user.uid);
     } catch (error) {
       console.error("Error:", error.message);
-      setError(error.message); // Display error message to the user
+      setError(error.message); 
     } finally {
       setIsLoading(false);
     }
@@ -117,11 +118,11 @@ const Login = () => {
     <div className="flex min-h-[100vh] justify-center items-center bg-gray-100 lg:gap-5 lg:px-20 rounded-md shadow-sm">
       <div className="sm:flex-1">
         <form className="  bg-white px-20">
-          <h5>Icon</h5>
+          <h5>GeraMenu</h5>
           <h2 className="text-2xl font-sbold mb-5 text-center">
             {isNewUser ? "Sign Up" : "Login"}
           </h2>
-          <h2 className="m-4 text-gray-600">Transforme o seu <span className="font-bold">menu</span> em um QR Code em segundos – fácil, rápido e pronto para compartilhar!</h2>
+          <h1 className="my-4 text-gray-600 text-xl">Transforme o seu <span className="font-bold">menu</span> em um QR Code em segundos - fácil, rápido e pronto para compartilhar!</h1>
           {error && <p className="text-red-500 mb-4">{error}</p>}
           <div className="flex flex-col gap-4 mb-5 ">
             <input
@@ -176,6 +177,9 @@ const Login = () => {
       </div>
       <div className="lg:flex-1 lg:block hidden">
         <h1>Crie Teu QR Menu </h1>
+        <div>
+     {/*      <img src={image}/>  */}
+        </div>
 
       </div>
     </div>

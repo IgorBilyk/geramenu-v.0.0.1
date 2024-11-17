@@ -30,7 +30,7 @@ const Navbar = ({ active }) => {
   const handleSignOut = async () => {
     await signOut(auth);
     localStorage.removeItem("userID");
-    navigate("/");
+    navigate("/login");
   };
 
   function classNames(...classes) {
