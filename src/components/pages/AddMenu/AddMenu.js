@@ -148,10 +148,10 @@ console.log('image from add Item',item.image)
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <Button title="Close" styles="bg-red-500 m-4" onPress={onClose} />
+    <div className="min-h-[80%] ">
+      <Button title="Close" styles="bg-red-500" onPress={onClose} />
 
-      <div className="flex flex-col items-center mt-20">
+      <div className="flex flex-col items-center mt-5">
         <div className="w-full max-w-md bg-white p-6 shadow-md rounded-md max-h-[80vh] overflow-y-auto">
           <h2 className="text-2xl font-semibold mb-6">Adicionar Menu Item</h2>
           {error && <p className="text-red-500 mb-4 p-1">{error}</p>}

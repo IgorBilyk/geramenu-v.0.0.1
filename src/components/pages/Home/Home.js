@@ -111,7 +111,7 @@ const Home = () => {
 
   return (
     <div>
-      <div ref={topRef}>
+      <div ref={topRef} >
         <div className="sticky top-0 z-10 ">
           <Navbar />
           <nav className="sticky top-[64px] z-40 bg-gray-800 shadow-lg px-4 py-2">
@@ -131,16 +131,16 @@ const Home = () => {
               ))}
             </div>
           </nav>
-          <div className="container mx-auto pt-2">
+          <div className="container mx-auto pt-">
             <div className="flex justify-end items-center mb-8 mx-2">
-              <CustomButton title="Adicionar " onPress={() => openModal()} />
+              <CustomButton title="Adicionar" onPress={() => openModal()} styles='m-5' />
             </div>
           </div>
         </div>
 
-        {items.length === 0 && <p>No Items</p>}
+        {items.length === 0 && <p className="text-center font-medium">No Items</p>}
 
-        <h1 className="text-4xl font-bold mx-[100px]">Ementa</h1>
+       {items.length === 0 ? "" : <h1 className="text-4xl font-bold mx-[100px]">Ementa</h1>}
         <div className="grid md:grid-cols-2">
           {categories.map((category) => (
             <div
@@ -199,7 +199,7 @@ const Home = () => {
                           <div className="mt-4">
                             <Typography
                               color="blue-gray"
-                              className="font-medium mb-2"
+                              className="font-normal mb-2"
                             >
                               Variantes:
                             </Typography>
@@ -207,21 +207,30 @@ const Home = () => {
                               {item.variants.map((variant, index) => (
                                 <div
                                   key={index}
-                                  className="flex justify-between mb-2"
+                                  className="flex justify-between items-center mb-2 border-b-2"
                                 >
                                   <Typography
                                     color="gray"
-                                    className="font-normal"
+                                    className="font-bold"
                                   >
                                     {variant.name}
                                   </Typography>
-                                  <Typography
-                                    color="gray"
-                                    className="font-normal"
-                                  >
-                                    {variant.price}&#8364; - {variant.quantity}{" "}
-                                    {variant.unit}
-                                  </Typography>
+                                  <div>
+                                    <Typography
+                                      color="gray"
+                                      className="font-bold"
+                                    >
+                                      {variant.price}&#8364;
+                                    </Typography>
+                                    <Typography
+                                      color="gray"
+                                      className="font-normal"
+                                    >
+                                       {variant.quantity}{" "}
+                                      {variant.unit}
+                                    </Typography>
+                                  </div>
+                                  
                                 </div>
                               ))}
                             </div>
