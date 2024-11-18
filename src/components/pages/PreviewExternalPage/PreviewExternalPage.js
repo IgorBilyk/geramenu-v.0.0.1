@@ -63,7 +63,11 @@ const PreviewExternalPage = () => {
       };
 
       fetchItems();
-    } catch (error) {}
+    } catch (error) 
+    {
+      console.log(error)
+    }
+    console.log(userId)
   }, [userId]);
 
   const handleScrollToCategory = (category) => {

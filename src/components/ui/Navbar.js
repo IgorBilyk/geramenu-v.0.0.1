@@ -10,26 +10,35 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/firebase";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { getItem } from "../../utils/localStorage";
 
 const Navbar = ({ active }) => {
   const navigate = useNavigate();
-  const [navigation] = useState([
-    {
-      name: "Preview",
-      href: `/previewext/279kqLcgPlgbewcN0rRQyI6B01i2`,
-      current: active === "preview",
-    },
-    {
-      name: "Generate QR",
-      href: `/qr`,
-      current: active === "preview",
-    },
-  ]);
+  const [userID, setUserID] = useState(getItem("userID") || null);
+  
+  const [navigation, setNavigation] = useState([]);
+
+  useEffect(() => {
+    // Update navigation links dynamically when userID changes
+    setNavigation([
+      {
+        name: "Preview",
+        href: `/previewext/${userID || "guest"}`, // Use "guest" as a fallback for unauthenticated users
+        current: active === "preview",
+      },
+      {
+        name: "Generate QR",
+        href: `/qr`,
+        current: active === "qr",
+      },
+    ]);
+  }, [userID, active]);
 
   const handleSignOut = async () => {
     await signOut(auth);
     localStorage.removeItem("userID");
+    setUserID(null);
     navigate("/login");
   };
 
@@ -73,7 +82,6 @@ const Navbar = ({ active }) => {
           </div>
 
           {/* Profile dropdown */}
-
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:ml-4 sm:pr-0">
             <Menu as="div" className="relative ml-3">
               <div>
@@ -91,7 +99,7 @@ const Navbar = ({ active }) => {
                 transition
                 className="absolute right-0 z-60 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5"
               >
-                    {/* Settings Link */}
+                {/* Settings Link */}
                 <MenuItem
                   as="a"
                   href="/settings"

@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react";
 import { FcGoogle } from "react-icons/fc";
-/* import Х from './assets/images/QR_bg.jpg'
- */
 import { auth, db } from "../../../firebase/firebase";
 import {
   createUserWithEmailAndPassword,
@@ -19,25 +17,24 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const [isNewUser, setIsNewUser] = useState(false); // Toggle login/signup
-  const [isLoading, setIsLoading] = useState(false); // Loading state
+  const [isNewUser, setIsNewUser] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check login state and redirect if user is logged in
     onAuthStateChanged(auth, (user) => {
-      if (user) navigate("/"); // Redirect to menu page on login
+      if (user) navigate("/");
     });
   }, [navigate]);
 
   const handleLoginOrSignup = async (e) => {
     e.preventDefault();
-    setError(""); 
-    setIsLoading(true); 
+
+    setError("");
+    setIsLoading(true);
 
     try {
       if (isNewUser) {
-        // Create new user
         const userCredential = await createUserWithEmailAndPassword(
           auth,
           email,
@@ -45,16 +42,14 @@ const Login = () => {
         );
         const user = userCredential.user;
 
-        // Add user to Firestore database
         await setDoc(doc(db, "users", user.uid), {
           uid: user.uid,
           email: user.email,
-          createdAt: serverTimestamp(), 
+          createdAt: serverTimestamp(),
         });
 
         setItem("userID", user.uid);
       } else {
-        // Sign in existing user
         const signedUser = await signInWithEmailAndPassword(
           auth,
           email,
@@ -64,21 +59,20 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Error:", error.message);
-      setError(error.message); 
+      setError(error.message);
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
   const handleGoogleSignIn = async () => {
-    setError(""); 
+    setError("");
     setIsLoading(true);
     const provider = new GoogleAuthProvider();
     try {
       const userCredential = await signInWithPopup(auth, provider);
       const user = userCredential.user;
 
-      // Add or update user info in Firestore
       const userDocRef = doc(db, "users", user.uid);
       await setDoc(
         userDocRef,
@@ -87,13 +81,13 @@ const Login = () => {
           email: user.email,
           createdAt: serverTimestamp(),
         },
-        { merge: true } // Ensures existing users don't overwrite createdAt if already set
+        { merge: true }
       );
 
       setItem("userID", user.uid);
     } catch (error) {
       console.error("Error:", error.message);
-      setError(error.message); 
+      setError(error.message);
     } finally {
       setIsLoading(false);
     }
@@ -101,13 +95,17 @@ const Login = () => {
 
   const handlePasswordReset = async () => {
     if (!email) {
-      setError("Please enter your email to reset password.");
+      setError(
+        "Por favor, introduza o seu e-mail para redefinir a palavra-passe."
+      );
       return;
     }
 
     try {
       await sendPasswordResetEmail(auth, email);
-      setError("Password reset link sent to your email.");
+      setError(
+        "Link de redefinição de palavra-passe enviado para o seu e-mail."
+      );
     } catch (error) {
       console.error("Error:", error.message);
       setError(error.message);
@@ -115,72 +113,110 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-[100vh] justify-center items-center bg-gray-100 lg:gap-5 lg:px-20 rounded-md shadow-sm">
-      <div className="sm:flex-1">
-        <form className="  bg-white px-20">
-          <h5>GeraMenu</h5>
-          <h2 className="text-2xl font-sbold mb-5 text-center">
-            {isNewUser ? "Sign Up" : "Login"}
-          </h2>
-          <h1 className="my-4 text-gray-600 text-xl">Transforme o seu <span className="font-bold">menu</span> em um QR Code em segundos - fácil, rápido e pronto para compartilhar!</h1>
-          {error && <p className="text-red-500 mb-4">{error}</p>}
-          <div className="flex flex-col gap-4 mb-5 ">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4 sm:flex-row sm:gap-10 lg:px-20">
+      {/* Left Section */}
+      <div className="w-full max-w-md space-y-6">
+        <form
+          className="bg-white p-6 shadow-md rounded-lg"
+          onSubmit={handleLoginOrSignup}
+        >
+          <div className="text-center">
+            <h2 className="text-xl font-semibold text-gray-700">
+              {isNewUser ? "Sign Up" : "Login"}
+            </h2>
+            <p className="text-gray-500">
+              {isNewUser ? "Create a new account" : "Sign in to your account"}
+            </p>
+          </div>
+
+          {error && <p className="mt-2 text-center text-red-500">{error}</p>}
+
+          <div className="mt-4">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
             <input
-              required
               type="email"
-              placeholder="Email"
-              className="border p-3 rounded-md"
+              id="email"
+              required
+              value={email}
               onChange={(e) => setEmail(e.target.value)}
+              placeholder="example@gmail.com"
+              className="mt-1 p-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             />
+          </div>
+
+          <div className="mt-4">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
             <input
               required
               type="password"
-              placeholder="Password"
-              className="border p-3 rounded-md"
+              id="password"
+              value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder="Senha"
+              className="mt-1 p-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
             />
           </div>
-          <div className="flex flex-col justify-around mb-5">
-            <button
-              onClick={handleLoginOrSignup}
-              className="bg-[#16425b] text-white px-6 py-3 mb-2 rounded-md hover:bg-[#2c607e]"
-              disabled={isLoading}
-            >
-              {isLoading ? "Processing..." : isNewUser ? "Sign Up" : "Login"}
-            </button>
-            <button
-              type="button"
-              onClick={() => setIsNewUser(!isNewUser)}
-              className="text-gray-500"
-            >
-              {isNewUser ? "Switch to Login" : "or Sign Up with email"}
-            </button>
-          </div>
-          <button
-            type="button"
-            onClick={handleGoogleSignIn}
-            className=" flex w-full text-[#16425b] py-2 px-6 rounded-md mb-5 border justify-center items-center"
-          >
-            <FcGoogle  className="mr-5"/>
-            Sign in with Google
-          </button>
-          <div className="text-center">
+
+          <div className="mt-6 flex items-center justify-between">
             <button
               type="button"
               onClick={handlePasswordReset}
-              className="text-gray-500"
+              className="text-sm text-indigo-600 hover:underline"
             >
-              Forgot Password?
+              Esqueceu-se da sua senha?
             </button>
+          </div>
+
+          <button
+            type="submit"
+            onClick={handleLoginOrSignup}
+            disabled={isLoading}
+            className="mt-6 w-full rounded-md bg-indigo-600 py-2 text-white hover:bg-indigo-700 disabled:opacity-50"
+          >
+            {isLoading ? "Loading..." : isNewUser ? "Sign Up" : "Login"}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleGoogleSignIn}
+            className="mt-4 flex w-full items-center justify-center gap-2 rounded-md border py-2 text-gray-700 hover:bg-gray-100"
+          >
+            <FcGoogle size={20} />
+            Continue with Google
+          </button>
+
+          <div className="mt-4 text-center text-sm">
+            <p>
+              {isNewUser ? "Already have an account?" : "New here?"}{" "}
+              <button
+                type="button"
+                onClick={() => setIsNewUser(!isNewUser)}
+                className="text-indigo-600 hover:underline"
+              >
+                {isNewUser ? "Login" : "Sign Up"}
+              </button>
+            </p>
           </div>
         </form>
       </div>
-      <div className="lg:flex-1 lg:block hidden">
-        <h1>Crie Teu QR Menu </h1>
-        <div>
-     {/*      <img src={image}/>  */}
-        </div>
 
+      {/* Right Section */}
+      <div className="hidden w-full max-w-lg sm:block">
+        <img
+          src="./assets/images/QR_bg.jpg"
+          alt="Illustration"
+          className="w-full rounded-lg"
+        />
       </div>
     </div>
   );
