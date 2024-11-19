@@ -24,6 +24,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
     quantity: "",
     unit: "pcs",
   });
+  const [imagePreview, setImagePreview] = useState(null);
   const [variants, setVariants] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -57,8 +58,20 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
         unit: itemToEdit.unit || "pcs",
       });
       setVariants(itemToEdit.variants || []);
+      if (itemToEdit.image) {
+        setImagePreview(itemToEdit.image); // Assuming `itemToEdit.image` is a URL
+      }
     }
   }, [itemToEdit]);
+
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setItem({ ...item, image: file });
+      setImagePreview(URL.createObjectURL(file)); // Update preview for the selected file
+    }
+  };
 
   const handleUpload = async () => {
     setError("");
@@ -116,6 +129,8 @@ console.log('image from add Item',item.image)
         quantity: "",
         unit: "pcs",
       });
+      setImagePreview(null); // Reset image preview
+
       setVariants([]);
       onClose();
     } catch (error) {
@@ -200,11 +215,25 @@ console.log('image from add Item',item.image)
               onChange={(e) => setItem({ ...item, description: e.target.value })}
               className="w-full p-3 border rounded-md"
             ></textarea>
-            <input
+          {/*   <input
               type="file"
               onChange={(e) => setItem({ ...item, image: e.target.files[0] })}
               className="w-full p-3 border rounded-md"
+            /> */}
+               <input
+              type="file"
+              onChange={handleFileChange}
+              className="w-full p-3 border rounded-md"
             />
+            {imagePreview && (
+              <div className="mt-3">
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  className="w-full h-40 object-cover rounded-md"
+                />
+              </div>
+            )}
                 <div className="flex space-x-2">
               <input
                 type="number"
