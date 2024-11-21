@@ -78,9 +78,9 @@ const Home = () => {
   };
 
   const handleDeleteItem = async (itemId) => {
-    if (window.confirm("Are you sure you want to delete this item?")) {
+    if (window.confirm("Tem certeza de que deseja remover este item?")) {
       await deleteDoc(doc(db, "menuItems", itemId));
-      successMessage("Item has been deleted!");
+      successMessage("Item foi removido!");
     }
   };
 
@@ -153,6 +153,86 @@ const Home = () => {
                 {items
                   .filter((item) => item.category === category)
                   .map((item) => (
+                   /*  <Card
+  className="w-full max-w-screen-md mx-auto my-4 p-4 shadow-lg rounded-lg border"
+  key={item.id}
+>
+  <CardHeader shadow={false} floated={false} className="h-auto">
+    <img
+      src={item.image}
+      alt={item.name}
+      className="w-full h-auto object-cover rounded-lg cursor-pointer"
+      onClick={() => setZoomedImage(item.image)} // Set zoomed image on click
+    />
+  </CardHeader>
+  <CardBody>
+    <div className="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between border-b-2 pb-2">
+      <Typography color="blue-gray" className="font-medium">
+        {item.name}
+      </Typography>
+      <div className="mt-2 sm:mt-0">
+        <Typography color="blue-gray" className="font-medium">
+          {item.price}&#8364;
+        </Typography>
+        <div className="flex mt-1">
+          <Typography
+            color="blue-gray"
+            className="font-small mr-2"
+          >
+            {item.quantity}
+          </Typography>
+          <Typography color="blue-gray" className="font-small">
+            {item.unit}
+          </Typography>
+        </div>
+      </div>
+    </div>
+
+    {item.variants && item.variants.length > 0 && (
+      <div className="mt-4">
+        <Typography
+          color="blue-gray"
+          className="font-medium mb-2"
+        >
+          Variantes:
+        </Typography>
+        <div>
+          {item.variants.map((variant, index) => (
+            <div
+              key={index}
+              className="flex justify-between mb-2"
+            >
+              <Typography
+                color="gray"
+                className="font-medium"
+              >
+                {variant.name}
+              </Typography>
+              <Typography
+                color="gray"
+                className="font-medium"
+              >
+                {variant.price}&#8364; - {variant.quantity}{" "}
+                {variant.unit}
+              </Typography>
+            </div>
+          ))}
+        </div>
+      </div>
+    )}
+
+    {item.description && (
+      <Typography
+        variant="small"
+        color="gray"
+        className="font-normal opacity-75 mt-4"
+      >
+        {item.description}
+      </Typography>
+    )}
+  </CardBody>
+</Card>
+ */
                     <Card className="w-96" key={item.id}>
                       <CardHeader
                         shadow={false}
@@ -160,7 +240,7 @@ const Home = () => {
                         className="h-96"
                       >
                         <img
-                          src={item.image}
+                          src={item?.image ? item?.image : null}
                           alt={item.name}
                           className="h-full w-full object-cover cursor-pointer"
                           onClick={() => setZoomedImage(item.image)} // Set zoomed image on click

@@ -16,15 +16,16 @@ import { getItem } from "../../utils/localStorage";
 const Navbar = ({ active }) => {
   const navigate = useNavigate();
   const [userID, setUserID] = useState(getItem("userID") || null);
-  
+
   const [navigation, setNavigation] = useState([]);
 
   useEffect(() => {
     // Update navigation links dynamically when userID changes
+    console.log("from Navbar", userID);
     setNavigation([
       {
         name: "Preview",
-        href: `/previewext/${userID || "guest"}`, // Use "guest" as a fallback for unauthenticated users
+        href: `/previewext/${userID}`, // Use "guest" as a fallback for unauthenticated users
         current: active === "preview",
       },
       {
@@ -88,11 +89,20 @@ const Navbar = ({ active }) => {
                 <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                   <span className="absolute -inset-1.5" />
                   <span className="sr-only">Open user menu</span>
-                  <img
-                    alt="User Avatar"
-                    src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
-                    className="h-8 w-8 rounded-full"
-                  />
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="white"
+                    viewBox="0 0 24 24"
+                    stroke-width="1.5"
+                    stroke="white"
+                    class="size-8"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
+                    />
+                  </svg>
                 </MenuButton>
               </div>
               <MenuItems
