@@ -14,6 +14,8 @@ const Settings = () => {
     address: "",
     phone: "",
     email: "",
+    wifi: "",
+    wifiPassword:"",
     workingHours: {
       lunchOpen: "",
       lunchClose: "",
@@ -85,9 +87,9 @@ const Settings = () => {
         ...formData,
         imageUrl,
       });
-      successMessage('Restaurant info has been added!')
+      successMessage('Informações foram adicionadas!')
     } catch (error) {
-      warningMessage('Something went wrong, pleae try again!')
+      warningMessage('Algo correu errado, tente novamente!')
     }
   };
 
@@ -136,6 +138,26 @@ const Settings = () => {
               type="email"
               name="email"
               value={formData.email}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block mb-2">Wi-Fi Rede:</label>
+            <input
+              type="text"
+              name="wifi"
+              value={formData.wifi}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block mb-2">Wi-Fi Password:</label>
+            <input
+              type="text"
+              name="wifiPassword"
+              value={formData.wifiPassword}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-md"
             />

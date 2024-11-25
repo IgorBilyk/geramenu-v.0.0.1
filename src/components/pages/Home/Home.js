@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react"; 
+import { useState, useEffect, useRef } from "react";
 import { db } from "../../../firebase/firebase";
 import { auth } from "../../../firebase/firebase";
 import {
@@ -14,14 +14,16 @@ import { useParams } from "react-router-dom";
 import Navbar from "../../ui/Navbar";
 import { FaArrowUp } from "react-icons/fa";
 import AddMenu from "../AddMenu/AddMenu";
+
 import CustomButton from "../../ui/Button";
-import {
+/* import {
   Card,
   CardHeader,
   CardBody,
   Typography,
-} from "@material-tailwind/react";
+} from "@material-tailwind/react"; */
 import { successMessage } from "../../../handlers/toastHandler";
+import CardComponent from "../PreviewExternalPage/CardComponent";
 
 const Home = () => {
   const { userId } = useParams();
@@ -111,8 +113,8 @@ const Home = () => {
 
   return (
     <div>
-      <div ref={topRef} >
-        <div className="sticky top-0 z-10 ">
+      <div ref={topRef}>
+        <div className="sticky top-0 z-10">
           <Navbar />
           <nav className="sticky top-[64px] z-40 bg-gray-800 shadow-lg px-4 py-2">
             <div className="flex flex-wrap justify-center gap-2 md:gap-4 py-3">
@@ -133,14 +135,22 @@ const Home = () => {
           </nav>
           <div className="container mx-auto pt-">
             <div className="flex justify-end items-center mb-8 mx-2">
-              <CustomButton title="Adicionar" onPress={() => openModal()} styles='m-5' />
+              <CustomButton
+                title="Adicionar"
+                onPress={() => openModal()}
+                styles="m-5"
+              />
             </div>
           </div>
         </div>
 
-        {items.length === 0 && <p className="text-center font-medium">No Items</p>}
+        {items.length === 0 && (
+          <p className="text-center font-medium">No Items</p>
+        )}
 
-       {items.length === 0 ? "" : <h1 className="text-4xl font-bold mx-[100px]">Ementa</h1>}
+        {items.length > 0 && (
+          <h1 className="text-4xl font-bold mx-[100px]">Ementa</h1>
+        )}
         <div className="grid md:grid-cols-2">
           {categories.map((category) => (
             <div
@@ -153,192 +163,60 @@ const Home = () => {
                 {items
                   .filter((item) => item.category === category)
                   .map((item) => (
+                    <CardComponent item={item} key={item.id} setZoomedImage={setZoomedImage} openModal={openModal} handleDeleteItem={handleDeleteItem} external={false}/>
                    /*  <Card
-  className="w-full max-w-screen-md mx-auto my-4 p-4 shadow-lg rounded-lg border"
-  key={item.id}
->
-  <CardHeader shadow={false} floated={false} className="h-auto">
-    <img
-      src={item.image}
-      alt={item.name}
-      className="w-full h-auto object-cover rounded-lg cursor-pointer"
-      onClick={() => setZoomedImage(item.image)} // Set zoomed image on click
-    />
-  </CardHeader>
-  <CardBody>
-    <div className="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between border-b-2 pb-2">
-      <Typography color="blue-gray" className="font-medium">
-        {item.name}
-      </Typography>
-      <div className="mt-2 sm:mt-0">
-        <Typography color="blue-gray" className="font-medium">
-          {item.price}&#8364;
-        </Typography>
-        <div className="flex mt-1">
-          <Typography
-            color="blue-gray"
-            className="font-small mr-2"
-          >
-            {item.quantity}
-          </Typography>
-          <Typography color="blue-gray" className="font-small">
-            {item.unit}
-          </Typography>
-        </div>
-      </div>
-    </div>
-
-    {item.variants && item.variants.length > 0 && (
-      <div className="mt-4">
-        <Typography
-          color="blue-gray"
-          className="font-medium mb-2"
-        >
-          Variantes:
-        </Typography>
-        <div>
-          {item.variants.map((variant, index) => (
-            <div
-              key={index}
-              className="flex justify-between mb-2"
-            >
-              <Typography
-                color="gray"
-                className="font-medium"
-              >
-                {variant.name}
-              </Typography>
-              <Typography
-                color="gray"
-                className="font-medium"
-              >
-                {variant.price}&#8364; - {variant.quantity}{" "}
-                {variant.unit}
-              </Typography>
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
-
-    {item.description && (
-      <Typography
-        variant="small"
-        color="gray"
-        className="font-normal opacity-75 mt-4"
-      >
-        {item.description}
-      </Typography>
-    )}
-  </CardBody>
-</Card>
- */
-                    <Card className="w-96" key={item.id}>
-                      <CardHeader
-                        shadow={false}
-                        floated={false}
-                        className="h-96"
-                      >
-                        <img
-                          src={item?.image ? item?.image : null}
-                          alt={item.name}
-                          className="h-full w-full object-cover cursor-pointer"
-                          onClick={() => setZoomedImage(item.image)} // Set zoomed image on click
-                        />
-                      </CardHeader>
-                      <CardBody>
-                        <div className="mb-2 flex items-center justify-between border-b-2">
-                          <Typography color="blue-gray" className="font-medium">
-                            {item.name}
+                    clasName="w-full sm:w-80 md:w-96 my-4 px-5 mx-auto shadow-lg rounded-lg border"
+                    key={item.id}
+                  >
+                    <CardHeader
+                      shadow={false}
+                      floated={false}
+                      className="h-48 sm:h-56 bg-gray-300"
+                    >
+                      <img
+                        src={item?.image || ""}
+                        alt={item.name}
+                        className="h-full w-full object-cover rounded-t-lg cursor-pointer"
+                        onClick={() => setZoomedImage(item.image)} // Set zoomed image on click
+                      />
+                    </CardHeader>
+                    <CardBody>
+                      <div className="mb-2 flex flex-col sm:flex-row items-center justify-between border-b-2 pb-2">
+                        <Typography color="blue-gray" className="font-medium text-lg sm:text-xl">
+                          {item.name}
+                        </Typography>
+                        <div className="text-center sm:text-right mt-2 sm:mt-0">
+                          <Typography color="blue-gray" className="font-medium text-base">
+                            {item.price}&#8364;
                           </Typography>
-                          <div>
+                          <div className="flex justify-center sm:justify-end mt-1">
                             <Typography
                               color="blue-gray"
-                              className="font-medium"
+                              className="font-small mr-2 text-sm"
                             >
-                              {item.price}&#8364;
+                              {item.quantity}
                             </Typography>
-                            <div className="flex">
-                              <Typography
-                                color="blue-gray"
-                                className="font-small mr-2"
-                              >
-                                {item.quantity}
-                              </Typography>
-                              <Typography
-                                color="blue-gray"
-                                className="font-small"
-                              >
-                                {item.unit}
-                              </Typography>
-                            </div>
+                            <Typography color="blue-gray" className="font-small text-sm">
+                              {item.unit}
+                            </Typography>
                           </div>
                         </div>
-
-                        {item.variants && item.variants.length > 0 && (
-                          <div className="mt-4">
-                            <Typography
-                              color="blue-gray"
-                              className="font-normal mb-2"
-                            >
-                              Variantes:
-                            </Typography>
-                            <div>
-                              {item.variants.map((variant, index) => (
-                                <div
-                                  key={index}
-                                  className="flex justify-between items-center mb-2 border-b-2"
-                                >
-                                  <Typography
-                                    color="gray"
-                                    className="font-bold"
-                                  >
-                                    {variant.name}
-                                  </Typography>
-                                  <div>
-                                    <Typography
-                                      color="gray"
-                                      className="font-bold"
-                                    >
-                                      {variant.price}&#8364;
-                                    </Typography>
-                                    <Typography
-                                      color="gray"
-                                      className="font-normal"
-                                    >
-                                       {variant.quantity}{" "}
-                                      {variant.unit}
-                                    </Typography>
-                                  </div>
-                                  
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
-
-                        {item.description && (
-                          <Typography
-                            variant="small"
-                            color="gray"
-                            className="font-normal opacity-75"
-                          >
-                            {item.description}
-                          </Typography>
-                        )}
-                      </CardBody>
-                      <div className="flex justify-around gap-4 pb-4">
-                        <CustomButton
-                          title="Editar"
-                          onPress={() => openModal(item)}
-                        />
-                        <CustomButton
-                          title="Remover"
-                          onPress={() => handleDeleteItem(item?.id)}
-                          styles="bg-red-500"
-                        />
                       </div>
-                    </Card>
+                    </CardBody>
+                    <div className="flex flex-col sm:flex-row justify-around gap-4 pb-4 px-4">
+                      <CustomButton
+                        title="Editar"
+                        onPress={() => openModal(item)}
+                        styles="w-full sm:w-auto"
+                      />
+                      <CustomButton
+                        title="Remover"
+                        onPress={() => handleDeleteItem(item?.id)}
+                        styles="bg-red-500 w-full sm:w-auto"
+                      />
+                    </div>
+                  </Card> */
+                  
                   ))}
               </div>
             </div>
@@ -357,7 +235,11 @@ const Home = () => {
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
           <div className="bg-white p-6 rounded shadow-lg max-w-md w-full">
-            <AddMenu itemToEdit={selectedItem} onClose={closeModal} availableCategories={categories} />
+            <AddMenu
+              itemToEdit={selectedItem}
+              onClose={closeModal}
+              availableCategories={categories}
+            />
           </div>
         </div>
       )}

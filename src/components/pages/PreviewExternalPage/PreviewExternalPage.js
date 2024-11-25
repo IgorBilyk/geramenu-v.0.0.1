@@ -1,80 +1,67 @@
 import React, { useState, useEffect, useRef } from "react";
 import { db } from "../../../firebase/firebase";
-import { collection, query, where, getDocs } from "firebase/firestore";
-import { useParams, Link, useNavigate } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa";
+import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import { useParams, Link } from "react-router-dom";
+import { FaArrowLeft, FaArrowUp } from "react-icons/fa";
 
-
-
-
-import {
-  FaArrowUp,
-  FaFish,
-  FaDrumstickBite,
-  FaCarrot,
-  FaLeaf,
-} from "react-icons/fa";
-
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  Typography,
-} from "@material-tailwind/react";
-import Navbar from "../../ui/Navbar";
-
+import CardComponent from "./CardComponent";
 
 const PreviewExternalPage = () => {
   const { userId } = useParams(); // Extract user ID from URL
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState("");
+  const [restaurantInfo, setRestaurantInfo] = useState(null); // For restaurant info
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false); // To toggle expansion
   const topRef = useRef(null);
 
-  const [zoomedImage, setZoomedImage] = useState(null); // State for zoomed image
-  // Map categories to icons
-  const categoryIcons = {
-    Fish: FaFish,
-    Meat: FaDrumstickBite,
-    Vegetables: FaCarrot,
-    Vegan: FaLeaf,
-    // Add other categories and icons as needed
-  };
-
+  // Fetch restaurant data
   useEffect(() => {
-    try {
-      const fetchItems = async () => {
+    const fetchRestaurantData = async () => {
+      try {
+        const docRef = doc(db, "restaurants", userId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setRestaurantInfo(docSnap.data());
+        }
+      } catch (error) {
+        console.error("Failed to fetch restaurant data:", error);
+      }
+    };
+
+    fetchRestaurantData();
+  }, [userId]);
+
+  // Fetch menu items
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
         const itemsRef = collection(db, "menuItems");
         const q = query(itemsRef, where("userId", "==", userId));
         const querySnapshot = await getDocs(q);
         const menuItems = querySnapshot.docs.map((doc) => ({
-          id: doc.id, // Use document ID as a unique key
+          id: doc.id,
           ...doc.data(),
         }));
 
         setItems(menuItems);
 
-        const uniqueCategories = [
-          ...new Set(menuItems.map((item) => item.category)),
-        ];
+        const uniqueCategories = [...new Set(menuItems.map((item) => item.category))];
         setCategories(uniqueCategories);
 
-        // Set initial active category to the first one, if available
         if (uniqueCategories.length > 0) {
           setActiveCategory(uniqueCategories[0]);
         }
-      };
+      } catch (error) {
+        console.error("Failed to fetch menu items:", error);
+      }
+    };
 
-      fetchItems();
-    } catch (error) 
-    {
-      console.log(error)
-    }
-    console.log(userId)
+    fetchItems();
   }, [userId]);
 
-  const handleScrollToCategory = (category) => {
-    setActiveCategory(category); // Update active category directly
+  const toggleInfoExpansion = () => {
+    setIsInfoExpanded(!isInfoExpanded);
   };
 
   const scrollToTop = () => {
@@ -83,15 +70,73 @@ const PreviewExternalPage = () => {
 
   return (
     <div>
-   <Link to="/" className="my-5"> <FaArrowLeft className="font-medium text-[2rem]"/></Link>
+      <Link to="/" className="my-5">
+        <FaArrowLeft className="font-medium text-[2rem]" />
+      </Link>
       <div ref={topRef}>
-        {/* Navbar with category buttons */}
-        <nav className="sticky top-0 left-0 w-full z-10 bg-gray-100">
+        {/* Restaurant Info Section */}
+        {restaurantInfo && (
+          <div
+            className={`fixed top-10 left-0 w-full z-20 p-4 bg-white shadow-md rounded-md transition-transform ${
+              isInfoExpanded ? "h-auto" : "h-[80px]"
+            }`}
+          >
+            <div
+              className="cursor-pointer flex justify-between items-center"
+              onClick={toggleInfoExpansion}
+            >
+              <div className="flex items-center gap-4">
+                {restaurantInfo.imageUrl && (
+                  <img
+                    src={restaurantInfo.imageUrl}
+                    alt="Restaurant"
+                    className="w-16 h-16 object-cover rounded-full"
+                  />
+                )}
+                <div>
+                  <h2 className="text-xl font-bold">{restaurantInfo.restaurantName}</h2>
+                  <p className="text-sm text-gray-600">
+                    {restaurantInfo.address} 
+                  </p>
+                 <a href={restaurantInfo.phone}>{restaurantInfo.phone}</a>
+                </div>
+              </div>
+              <button
+                className="text-sm font-medium text-blue-500"
+              >
+                {isInfoExpanded ? "Mostrar menos" : "Mostrar mais"}
+              </button>
+            </div>
+            {isInfoExpanded && (
+              <div className="mt-4 text-gray-800">
+                <p><strong>Email:</strong> {restaurantInfo.email}</p>
+                <p><strong>WiFi:</strong> {restaurantInfo.wifi}</p>
+                <p><strong>WiFi Password:</strong> {restaurantInfo.wifiPassword}</p>
+                <p><strong>Horas:</strong></p>
+                <ul>
+                  <li>
+                    Almoço: {restaurantInfo.workingHours.lunchOpen} -{" "}
+                    {restaurantInfo.workingHours.lunchClose}
+                  </li>
+                  <li>
+                    Jantar: {restaurantInfo.workingHours.dinnerOpen} -{" "}
+                    {restaurantInfo.workingHours.dinnerClose}
+                  </li>
+                </ul>
+                <p><strong>Encerrado:</strong> {restaurantInfo.workingHours.closedDays.join(", ")}</p>
+                <p><strong>Descrição:</strong> {restaurantInfo.description}</p>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Category Navigation */}
+        <nav className="sticky top-[120px] left-0 w-full z-10 bg-gray-100">
           <div className="flex justify-center space-x-4 py-3">
             {categories.map((category) => (
               <button
-                key={category} // Ensure unique key for each category button
-                onClick={() => handleScrollToCategory(category)}
+                key={category}
+                onClick={() => setActiveCategory(category)}
                 className={`px-4 py-2 rounded-full ${
                   activeCategory === category
                     ? "bg-gray-800 text-white"
@@ -104,8 +149,8 @@ const PreviewExternalPage = () => {
           </div>
         </nav>
 
-        {/* Content displaying items from only the active category */}
-        <div className="container mx-auto pt-20 mt-20">
+        {/* Menu Items */}
+        <div className="container mx-auto pt-20 mt-20 px-4">
           <h1 className="text-4xl font-bold mb-8">Menu</h1>
           {activeCategory && (
             <div className="flex flex-col items-center">
@@ -118,112 +163,36 @@ const PreviewExternalPage = () => {
                       item.outOfStock === false
                   )
                   .map((item) => (
-          
-                  <Card
-  className="w-full max-w-screen-md mx-auto my-4 px-2 shadow-lg rounded-lg border"
-  key={item.id}
->
-  <CardHeader shadow={false} floated={false} className="h-auto">
-    <img
-      src={item.image}
-      alt={item.name}
-      className="w-full h-auto object-cover rounded-lg cursor-pointer"
-      onClick={() => setZoomedImage(item.image)} // Set zoomed image on click
-    />
-  </CardHeader>
-  <CardBody>
-    <div className="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between border-b-2 pb-2">
-      <Typography color="blue-gray" className="font-medium">
-        {item.name}
-      </Typography>
-      <div className="mt-2 sm:mt-0">
-        <Typography color="blue-gray" className="font-medium">
-          {item.price}&#8364;
-        </Typography>
-        <div className="flex mt-1">
-          <Typography
-            color="blue-gray"
-            className="font-small mr-2"
-          >
-            {item.quantity}
-          </Typography>
-          <Typography color="blue-gray" className="font-small">
-            {item.unit}
-          </Typography>
-        </div>
-      </div>
-    </div>
-
-    {item.variants && item.variants.length > 0 && (
-      <div className="mt-4">
-        <Typography
-          color="blue-gray"
-          className="font-medium mb-2"
-        >
-          Variantes:
-        </Typography>
-        <div>
-          {item.variants.map((variant, index) => (
-            <div
-              key={index}
-              className="flex justify-between mb-2"
-            >
-              <Typography
-                color="gray"
-                className="font-medium"
-              >
-                {variant.name}
-              </Typography>
-              <Typography
-                color="gray"
-                className="font-medium"
-              >
-                {variant.price}&#8364; - {variant.quantity}{" "}
-                {variant.unit}
-              </Typography>
-            </div>
-          ))}
-        </div>
-      </div>
-    )}
-
-    {item.description && (
-      <Typography
-        variant="small"
-        color="gray"
-        className="font-normal opacity-75 mt-4"
-      >
-        {item.description}
-      </Typography>
-    )}
-  </CardBody>
-</Card>
-
+                    <CardComponent
+                      key={item.id}
+                      item={item}
+                      external="true"
+                     /*  setZoomedImage={(image) => setZoomedImage(image)} */
+                    />
                   ))}
               </div>
             </div>
           )}
         </div>
-        {zoomedImage && (
+      </div>
+
+      {/* Zoomed Image */}
+   {/*    {zoomedImage && (
         <div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
-          onClick={() => setZoomedImage(null)} // Close on click
+          onClick={() => setZoomedImage(null)}
         >
-          <img
-            src={zoomedImage}
-            alt="Zoomed"
-            className="w-full h-full object-contain"
-          />
+          <img src={zoomedImage} alt="Zoomed" className="w-full h-full object-contain" />
         </div>
-      )}
-        {/* Scroll-to-top button */}
-        <button
-          onClick={scrollToTop}
-          className="fixed bottom-[120px] right-4 p-3 rounded-full bg-gray-800 text-white shadow-lg"
-        >
-          <FaArrowUp />
-        </button>
-      </div>
+      )} */}
+
+    
+      <button
+        onClick={scrollToTop}
+        className="fixed bottom-[120px] right-4 p-3 rounded-full bg-gray-800 text-white shadow-lg"
+      >
+        <FaArrowUp />
+      </button>
     </div>
   );
 };

@@ -12,6 +12,8 @@ import { Toaster, toast } from "sonner";
 import Button from "../../ui/Button";
 import { successMessage } from "../../../handlers/toastHandler";
 
+const placeholderImage = "https://via.placeholder.com/150";
+
 const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) => {
   const [item, setItem] = useState({
     category: "",
@@ -24,27 +26,16 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
     quantity: "",
     unit: "pcs",
   });
-  const [imagePreview, setImagePreview] = useState(null);
+
+  const [imagePreview, setImagePreview] = useState(placeholderImage);
   const [variants, setVariants] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [filteredCategories, setFilteredCategories] = useState([]);
 
-  const handleAddVariant = () => {
-    setVariants([...variants, { name: "", price: "", quantity: "", unit: "pcs" }]);
-  };
-
-  const handleRemoveVariant = (index) => {
-    setVariants(variants.filter((_, i) => i !== index));
-  };
-
-  const handleVariantChange = (index, field, value) => {
-    const updatedVariants = [...variants];
-    updatedVariants[index][field] = value;
-    setVariants(updatedVariants);
-  };
-
+  // Initialize form for editing
   useEffect(() => {
+    console.log('from AddItem',itemToEdit)
     if (itemToEdit) {
       setItem({
         category: itemToEdit.category || "",
@@ -58,48 +49,88 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
         unit: itemToEdit.unit || "pcs",
       });
       setVariants(itemToEdit.variants || []);
-      if (itemToEdit.image) {
-        setImagePreview(itemToEdit.image); // Assuming `itemToEdit.image` is a URL
-      }
+      setImagePreview(itemToEdit.image || placeholderImage);
     }
   }, [itemToEdit]);
 
-
+  // Handle file selection and preview
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+    const maxSizeMB = 3;
+
     if (file) {
+      if (file.size > maxSizeMB * 1024 * 1024) {
+        alert(`Arquivo excede o tamanho máximo de ${maxSizeMB} MB.`);
+        return;
+      }
       setItem({ ...item, image: file });
-      setImagePreview(URL.createObjectURL(file)); // Update preview for the selected file
+      setImagePreview(URL.createObjectURL(file));
     }
   };
 
+  // Add a new variant
+  const handleAddVariant = () => {
+    setVariants([...variants, { name: "", price: "", quantity: "", unit: "pcs" }]);
+  };
+
+  // Remove a variant
+  const handleRemoveVariant = (index) => {
+    setVariants(variants.filter((_, i) => i !== index));
+  };
+
+  // Update specific fields of a variant
+  const handleVariantChange = (index, field, value) => {
+    const updatedVariants = [...variants];
+    updatedVariants[index][field] = value;
+    setVariants(updatedVariants);
+  };
+
+  // Handle category autocomplete
+  const handleCategoryChange = (e) => {
+    const input = e.target.value;
+    setItem({ ...item, category: input });
+
+    setFilteredCategories(
+      input
+        ? availableCategories.filter((cat) =>
+            cat.toLowerCase().includes(input.toLowerCase())
+          )
+        : []
+    );
+  };
+
+  const selectCategory = (category) => {
+    setItem({ ...item, category });
+    setFilteredCategories([]);
+  };
+
+  // Upload item to Firestore and Storage
   const handleUpload = async () => {
     setError("");
 
-    if (!item.category || !item.name || !item.price ) {
-      setError("Please fill out all required fields.");
+    if (!item.category || !item.name || !item.price) {
+      setError("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
-    if (!item.image) {
-      setError("Please upload an image.");
-      return;
-    }
+
     if (variants.some((v) => !v.name || !v.price || !v.quantity)) {
-      setError("Please fill out all variant fields.");
+      setError("Por favor, preencha todos os campos das variantes.");
       return;
     }
-console.log('image from add Item',item.image)
+
     setLoading(true);
 
     try {
       const userId = auth.currentUser?.uid;
-      if (!userId) {
-        throw new Error("User not authenticated");
-      }
+      if (!userId) throw new Error("Usuário não autenticado.");
 
-      const imageRef = ref(storage, `menuImages/${userId}/${item.image.name}`);
-      await uploadBytes(imageRef, item.image);
-      const imageUrl = await getDownloadURL(imageRef);
+      let imageUrl = placeholderImage;
+
+      if (item.image) {
+        const imageRef = ref(storage, `menuImages/${userId}/${item.image.name}`);
+        await uploadBytes(imageRef, item.image);
+        imageUrl = await getDownloadURL(imageRef);
+      }
 
       const itemData = {
         ...item,
@@ -111,65 +142,50 @@ console.log('image from add Item',item.image)
       };
 
       if (itemToEdit?.id) {
-        const itemDoc = doc(db, "menuItems", itemToEdit.id);
-        await setDoc(itemDoc, itemData, { merge: true });
+        await setDoc(doc(db, "menuItems", itemToEdit.id), itemData, { merge: true });
       } else {
         await addDoc(collection(db, "menuItems"), itemData);
       }
-      successMessage("Item added successfully!");
 
-      setItem({
-        category: "",
-        name: "",
-        price: "",
-        description: "",
-        options: "",
-        image: null,
-        outOfStock: false,
-        quantity: "",
-        unit: "pcs",
-      });
-      setImagePreview(null); // Reset image preview
-
-      setVariants([]);
+      successMessage("Item adicionado com sucesso!");
+      resetForm();
       onClose();
     } catch (error) {
       console.error("Error adding item:", error);
-      setError("Failed to add item. Please try again.");
-      toast.error("Failed to add item. Please try again.");
+      toast.error("Falha ao adicionar item. Tente novamente.");
     } finally {
       setLoading(false);
     }
   };
 
-  // Handle category input change with autocomplete
-  const handleCategoryChange = (e) => {
-    const input = e.target.value;
-    setItem({ ...item, category: input });
-
-    if (input) {
-      const filtered = availableCategories.filter((cat) =>
-        cat.toLowerCase().includes(input.toLowerCase())
-      );
-      setFilteredCategories(filtered);
-    } else {
-      setFilteredCategories([]);
-    }
-  };
-
-  const selectCategory = (category) => {
-    setItem({ ...item, category });
-    setFilteredCategories([]);
+  // Reset form fields
+  const resetForm = () => {
+    setItem({
+      category: "",
+      name: "",
+      price: "",
+      description: "",
+      options: "",
+      image: null,
+      outOfStock: false,
+      quantity: "",
+      unit: "pcs",
+    });
+    setImagePreview(placeholderImage);
+    setVariants([]);
+    setError("");
   };
 
   return (
-    <div className="min-h-[80%] ">
-      <Button title="Close" styles="bg-red-500" onPress={onClose} />
+    <div className="min-h-[80%]">
+      <Button title="Fechar" styles="bg-red-500" onPress={onClose} />
 
       <div className="flex flex-col items-center mt-5">
         <div className="w-full max-w-md bg-white p-6 shadow-md rounded-md max-h-[80vh] overflow-y-auto">
-          <h2 className="text-2xl font-semibold mb-6">Adicionar Menu Item</h2>
-          {error && <p className="text-red-500 mb-4 p-1">{error}</p>}
+          <h2 className="text-2xl font-semibold mb-6">
+            {itemToEdit ? "Editar Item" : "Adicionar Item"}
+          </h2>
+          {error && <p className="text-red-500 mb-4">{error}</p>}
 
           <div className="space-y-4">
             <div className="relative">
@@ -181,7 +197,7 @@ console.log('image from add Item',item.image)
                 className="w-full p-3 border rounded-md"
               />
               {filteredCategories.length > 0 && (
-                <ul className="absolute z-10 w-full bg-white border border-gray-300 rounded-md mt-1 max-h-40 overflow-y-auto">
+                <ul className="absolute z-10 w-full bg-white border mt-1 max-h-40 overflow-y-auto">
                   {filteredCategories.map((cat, index) => (
                     <li
                       key={index}
@@ -198,52 +214,46 @@ console.log('image from add Item',item.image)
             <input
               type="text"
               placeholder="Nome"
-              value={item.name || ""}
+              value={item.name}
               onChange={(e) => setItem({ ...item, name: e.target.value })}
               className="w-full p-3 border rounded-md"
             />
             <input
               type="number"
               placeholder="Preço"
-              value={item.price || ""}
+              value={item.price}
               onChange={(e) => setItem({ ...item, price: e.target.value })}
               className="w-full p-3 border rounded-md"
             />
             <textarea
               placeholder="Descrição (Opcional)"
-              value={item.description || ""}
+              value={item.description}
               onChange={(e) => setItem({ ...item, description: e.target.value })}
               className="w-full p-3 border rounded-md"
-            ></textarea>
-          {/*   <input
-              type="file"
-              onChange={(e) => setItem({ ...item, image: e.target.files[0] })}
-              className="w-full p-3 border rounded-md"
-            /> */}
-               <input
+            />
+            <input
               type="file"
               onChange={handleFileChange}
               className="w-full p-3 border rounded-md"
             />
-            {imagePreview && (
-              <div className="mt-3">
-                <img
-                  src={imagePreview}
-                  alt="Preview"
-                  className="w-full h-40 object-cover rounded-md"
-                />
-              </div>
-            )}
-                <div className="flex space-x-2">
+            <div className="mt-3">
+              <img
+                src={imagePreview}
+                alt="Preview"
+                className="w-full h-40 object-cover rounded-md"
+              />
+            </div>
+
+            <div className="flex space-x-2">
               <input
                 type="number"
                 placeholder="Quantidade"
-                value={item.quantity || ""}
+                value={item.quantity}
                 onChange={(e) => setItem({ ...item, quantity: e.target.value })}
                 className="w-full p-3 border rounded-md"
               />
               <select
-                value={item.unit || "pcs"}
+                value={item.unit}
                 onChange={(e) => setItem({ ...item, unit: e.target.value })}
                 className="p-3 border rounded-md"
               >
@@ -253,16 +263,16 @@ console.log('image from add Item',item.image)
                 <option value="pessoas">pessoas</option>
               </select>
             </div>
+
             <div className="flex items-center">
               <input
                 type="checkbox"
-                checked={item.outOfStock || false}
+                checked={item.outOfStock}
                 onChange={(e) =>
                   setItem({ ...item, outOfStock: e.target.checked })
                 }
                 className="mr-2"
               />
-              
               <label>Não em Stock</label>
             </div>
 
@@ -310,6 +320,7 @@ console.log('image from add Item',item.image)
                 </button>
               </div>
             ))}
+
             <button
               onClick={handleAddVariant}
               className="w-full mt-3 bg-green-500 text-white rounded-md py-2"

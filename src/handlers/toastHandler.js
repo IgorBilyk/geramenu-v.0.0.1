@@ -1,7 +1,7 @@
 import { toast } from "sonner";
 
 export const successMessage = (msg) => {
-  return toast.success("Item has been added!", {
+  return toast.success(msg, {
     unstyled: true,
     classNames: {
       toast: "bg-white rounded-xl p-5",
