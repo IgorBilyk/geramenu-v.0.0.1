@@ -71,14 +71,13 @@ const PreviewExternalPage = () => {
   return (
     <div>
       <Link to="/" className="my-5">
-        <FaArrowLeft className="font-medium text-[2rem]" />
+        <FaArrowLeft className="font-medium text-[2rem] text-bgGreen" />
       </Link>
-      <div ref={topRef}>
-        {/* Restaurant Info Section */}
-        {restaurantInfo && (
+           {/* Restaurant Info Section */}
+           {restaurantInfo && (
           <div
-            className={`fixed top-10 left-0 w-full z-20 p-4 bg-white shadow-md rounded-md transition-transform ${
-              isInfoExpanded ? "h-auto" : "h-[80px]"
+            className={` w-full z-20 p-4 rounded-md transition-transform ${
+              isInfoExpanded ? "h-auto" : "min-h-[80px]"
             }`}
           >
             <div
@@ -95,20 +94,20 @@ const PreviewExternalPage = () => {
                 )}
                 <div>
                   <h2 className="text-xl font-bold">{restaurantInfo.restaurantName}</h2>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-bgGreen">
                     {restaurantInfo.address} 
                   </p>
-                 <a href={restaurantInfo.phone}>{restaurantInfo.phone}</a>
+                 <a  href={`tel:${restaurantInfo.phone}`}>{restaurantInfo.phone}</a>
                 </div>
               </div>
               <button
-                className="text-sm font-medium text-blue-500"
+                className="text-sm font-medium text-bgGreen"
               >
                 {isInfoExpanded ? "Mostrar menos" : "Mostrar mais"}
               </button>
             </div>
             {isInfoExpanded && (
-              <div className="mt-4 text-gray-800">
+              <div className="mt-4 text-bgGreen">
                 <p><strong>Email:</strong> {restaurantInfo.email}</p>
                 <p><strong>WiFi:</strong> {restaurantInfo.wifi}</p>
                 <p><strong>WiFi Password:</strong> {restaurantInfo.wifiPassword}</p>
@@ -130,17 +129,20 @@ const PreviewExternalPage = () => {
           </div>
         )}
 
+      <div ref={topRef}>
+      
         {/* Category Navigation */}
-        <nav className="sticky top-[120px] left-0 w-full z-10 bg-gray-100">
-          <div className="flex justify-center space-x-4 py-3">
+        <nav className="sticky top-[0%] left-0 w-full z-10 bg-gray-[400]">
+       
+          <div className="flex justify-center space-x-4 py-5">
             {categories.map((category) => (
               <button
                 key={category}
                 onClick={() => setActiveCategory(category)}
                 className={`px-4 py-2 rounded-full ${
                   activeCategory === category
-                    ? "bg-gray-800 text-white"
-                    : "text-gray-700 font-bold"
+                    ? "bg-bgGreen text-textWhite"
+                    : "text-bgGreen font-bold border "
                 }`}
               >
                 {category}
@@ -150,7 +152,7 @@ const PreviewExternalPage = () => {
         </nav>
 
         {/* Menu Items */}
-        <div className="container mx-auto pt-20 mt-20 px-4">
+        <div className="container mx-auto pt-20 mt-20 px-4 text-bgGreen">
           <h1 className="text-4xl font-bold mb-8">Menu</h1>
           {activeCategory && (
             <div className="flex flex-col items-center">
@@ -167,8 +169,8 @@ const PreviewExternalPage = () => {
                       key={item.id}
                       item={item}
                       external="true"
-                     /*  setZoomedImage={(image) => setZoomedImage(image)} */
-                    />
+/*                       setZoomedImage={(image) => setZoomedImage(image)}
+ */                    />
                   ))}
               </div>
             </div>
@@ -177,7 +179,7 @@ const PreviewExternalPage = () => {
       </div>
 
       {/* Zoomed Image */}
-   {/*    {zoomedImage && (
+    {/*   {zoomedImage && (
         <div
           className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
           onClick={() => setZoomedImage(null)}
@@ -189,9 +191,9 @@ const PreviewExternalPage = () => {
     
       <button
         onClick={scrollToTop}
-        className="fixed bottom-[120px] right-4 p-3 rounded-full bg-gray-800 text-white shadow-lg"
+        className="fixed bottom-[120px] right-4 p-3 rounded-full bg-bgGreen text-white shadow-lg"
       >
-        <FaArrowUp />
+        <FaArrowUp className="text-textWhite"/>
       </button>
     </div>
   );

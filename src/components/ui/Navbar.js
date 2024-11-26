@@ -53,19 +53,19 @@ const Navbar = ({ active }) => {
   }
 
   return (
-    <Disclosure as="nav" className="bg-gray-800 sticky top-0 z-50 ">
+    <Disclosure as="nav" className="bg-bgGreen sticky top-0 z-50 text-textWhite">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8 ">
         <div className="relative flex h-16 items-center justify-between ">
           {/* Mobile menu button */}
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
-            <DisclosureButton className="inline-flex items-center justify-center p-2 text-gray-400 hover:bg-gray-700 hover:text-white focus:outline-none">
+            <DisclosureButton className="inline-flex items-center justify-center p-2 text-textWhite hover:bg-gray-700 hover:text-white focus:outline-none">
               <Bars3Icon className="block h-6 w-6" aria-hidden="true" />
               <XMarkIcon className="hidden h-6 w-6" aria-hidden="true" />
             </DisclosureButton>
           </div>
 
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
-            <Link to="/" className="text-white font-bold text-2xl hidden sm:block">
+            <Link to="/" className="text-textWhite font-bold text-2xl hidden sm:block">
               GeraMenu
             </Link>
             <div className="hidden sm:ml-6 sm:flex space-x-4">
@@ -91,7 +91,7 @@ const Navbar = ({ active }) => {
           <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:ml-4 sm:pr-0">
             <Menu as="div" className="relative ml-3">
               <div>
-                <MenuButton className="relative flex rounded-full bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
+                <MenuButton className="relative flex rounded-full bg-bgGreen text-sm focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800">
                   <span className="absolute -inset-1.5" />
                   <span className="sr-only">Open user menu</span>
                   <svg
@@ -112,7 +112,7 @@ const Navbar = ({ active }) => {
               </div>
               <MenuItems
                 transition
-                className="absolute right-0 z-60 mt-2 w-48 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5"
+                className="absolute right-0 z-60 mt-2 w-48 origin-top-right rounded-md bg-bgGreen text-textWhite shadow-lg ring-1 ring-black ring-opacity-2"
               >
                 {/* Settings Link */}
                 <MenuItem
@@ -137,8 +137,8 @@ const Navbar = ({ active }) => {
         </div>
       </div>
 
-      <DisclosurePanel className="sm:hidden">
-        <div className="space-y-1 px-2 pb-3 pt-2">
+      <DisclosurePanel className="sm:hidden bg-bgGreen">
+        <div className="space-y-1 px-2 pb-3 pt-2  bg-bgGreen">
           {navigation.map((item) => (
             <DisclosureButton
               key={item.name}
@@ -146,8 +146,8 @@ const Navbar = ({ active }) => {
               to={item.href}
               className={classNames(
                 item.current
-                  ? "bg-gray-900 text-white"
-                  : "text-gray-300 hover:bg-gray-700 hover:text-white",
+                  ? "bg-bgGreen text-white"
+                  : "text-gray-300 hover:bg-bgGreen hover:text-white",
                 "block rounded-md px-3 py-2 text-base font-medium"
               )}
               aria-current={item.current ? "page" : undefined}

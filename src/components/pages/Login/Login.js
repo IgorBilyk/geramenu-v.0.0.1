@@ -80,6 +80,8 @@ const Login = () => {
           uid: user.uid,
           email: user.email,
           createdAt: serverTimestamp(),
+          proAccess: false,
+          
         },
         { merge: true }
       );

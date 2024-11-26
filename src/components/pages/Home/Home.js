@@ -116,7 +116,7 @@ const Home = () => {
       <div ref={topRef}>
         <div className="sticky top-0 z-10">
           <Navbar />
-          <nav className="sticky top-[64px] z-40 bg-gray-800 shadow-lg px-4 py-2">
+          <nav className="sticky top-[64px] z-40 bg-gray shadow-lg px-4 py-2">
             <div className="flex flex-wrap justify-center gap-2 md:gap-4 py-3">
               {categories.map((category) => (
                 <button
@@ -124,8 +124,8 @@ const Home = () => {
                   onClick={() => handleScrollToCategory(category)}
                   className={`px-4 py-2 rounded-xl border-2 ${
                     activeCategory === category
-                      ? "bg-blue-400 text-white"
-                      : "text-white"
+                      ? "bg-bgGreen text-textWhite"
+                      : "text-bgGreen"
                   }`}
                 >
                   {category}
@@ -138,7 +138,7 @@ const Home = () => {
               <CustomButton
                 title="Adicionar"
                 onPress={() => openModal()}
-                styles="m-5"
+                styles="m-5 bg-bgGreen text-textWhite"
               />
             </div>
           </div>
@@ -163,8 +163,15 @@ const Home = () => {
                 {items
                   .filter((item) => item.category === category)
                   .map((item) => (
-                    <CardComponent item={item} key={item.id} setZoomedImage={setZoomedImage} openModal={openModal} handleDeleteItem={handleDeleteItem} external={false}/>
-                   /*  <Card
+                    <CardComponent
+                      item={item}
+                      key={item.id}
+                      setZoomedImage={setZoomedImage}
+                      openModal={openModal}
+                      handleDeleteItem={handleDeleteItem}
+                      external={false}
+                    />
+                    /*  <Card
                     clasName="w-full sm:w-80 md:w-96 my-4 px-5 mx-auto shadow-lg rounded-lg border"
                     key={item.id}
                   >
@@ -216,7 +223,6 @@ const Home = () => {
                       />
                     </div>
                   </Card> */
-                  
                   ))}
               </div>
             </div>
@@ -226,7 +232,7 @@ const Home = () => {
 
       <button
         onClick={scrollToTop}
-        className="fixed bottom-4 right-4 p-3 rounded-full bg-blue-500 text-white shadow-lg hover:bg-blue-600"
+        className="fixed bottom-4 right-4 p-3 rounded-full bg-bgGreen text-textWhite shadow-lg hover:bg-blue-600"
       >
         <FaArrowUp />
       </button>
@@ -234,7 +240,7 @@ const Home = () => {
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded shadow-lg max-w-md w-full">
+          <div className="bg-white rounded shadow-lg max-w-md w-full">
             <AddMenu
               itemToEdit={selectedItem}
               onClose={closeModal}

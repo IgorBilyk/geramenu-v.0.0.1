@@ -22,13 +22,13 @@ export default function CardComponent({
 
   return (
     <Card
-      className="w-full sm:w-80 md:w-96 my-4 px-5 mx-auto shadow-lg rounded-lg border"
+      className="w-full sm:w-80 md:w-96 my-4 px-5 mx-auto shadow-lg rounded-lg"
       key={id}
     >
       <CardHeader
         shadow={false}
         floated={false}
-        className="h-48 sm:h-56 bg-gray-300"
+        className="h-48 sm:h-56 bg-bgGreen"
       >
         <img
           src={image || ""}
@@ -37,10 +37,10 @@ export default function CardComponent({
           onClick={() => setZoomedImage(image)} // Set zoomed image on click
         />
       </CardHeader>
-      <CardBody className="py-0">
+      <CardBody className="py-0 text-bgGreen">
         <div className="mb-2 flex sm:flex-row items-center justify-between border-b-2 pb-2">
           <Typography
-            color="blue-gray"
+            color="bgGreen"
             className="font-medium text-lg sm:text-xl"
           >
             {name}
@@ -64,7 +64,7 @@ export default function CardComponent({
       {variants.length > 0 &&
         variants.map((item, index) => {
           return (
-            <CardBody className="py-0" key={index}>
+            <CardBody className="py-0" key={index} text-bgGreen>
               <div className="mb-2 flex sm:flex-row items-center justify-between border-b-2 pb-2">
                 <Typography
                   color="blue-gray"
@@ -99,7 +99,7 @@ export default function CardComponent({
           );
         })}
       <CardBody>
-        <Typography color="blue-gray" className="font-small text-sm">
+        <Typography color="blue-gray" className="font-small text-sm text-bgGreen">
           {description}
         </Typography>
       </CardBody>
@@ -108,12 +108,12 @@ export default function CardComponent({
           <CustomButton
             title="Editar"
             onPress={() => openModal(item)}
-            styles="w-full sm:w-auto"
+            styles="w-full sm:w-auto bg-blue text-textWhite"
           />
           <CustomButton
             title="Remover"
             onPress={() => handleDeleteItem(item?.id)}
-            styles="bg-red-500 w-full sm:w-auto"
+            styles="bg-red-500 w-full sm:w-auto bg-red text-textWhite"
           />
         </div>
       )}

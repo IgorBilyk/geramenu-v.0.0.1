@@ -14,7 +14,12 @@ import { successMessage } from "../../../handlers/toastHandler";
 
 const placeholderImage = "https://via.placeholder.com/150";
 
-const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) => {
+const AddMenu = ({
+  itemToEdit,
+  onClose,
+  onUpdateItems,
+  availableCategories,
+}) => {
   const [item, setItem] = useState({
     category: "",
     name: "",
@@ -35,7 +40,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
 
   // Initialize form for editing
   useEffect(() => {
-    console.log('from AddItem',itemToEdit)
+    console.log("from AddItem", itemToEdit);
     if (itemToEdit) {
       setItem({
         category: itemToEdit.category || "",
@@ -70,7 +75,10 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
 
   // Add a new variant
   const handleAddVariant = () => {
-    setVariants([...variants, { name: "", price: "", quantity: "", unit: "pcs" }]);
+    setVariants([
+      ...variants,
+      { name: "", price: "", quantity: "", unit: "pcs" },
+    ]);
   };
 
   // Remove a variant
@@ -127,7 +135,10 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
       let imageUrl = placeholderImage;
 
       if (item.image) {
-        const imageRef = ref(storage, `menuImages/${userId}/${item.image.name}`);
+        const imageRef = ref(
+          storage,
+          `menuImages/${userId}/${item.image.name}`
+        );
         await uploadBytes(imageRef, item.image);
         imageUrl = await getDownloadURL(imageRef);
       }
@@ -142,7 +153,9 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
       };
 
       if (itemToEdit?.id) {
-        await setDoc(doc(db, "menuItems", itemToEdit.id), itemData, { merge: true });
+        await setDoc(doc(db, "menuItems", itemToEdit.id), itemData, {
+          merge: true,
+        });
       } else {
         await addDoc(collection(db, "menuItems"), itemData);
       }
@@ -177,11 +190,11 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
   };
 
   return (
-    <div className="min-h-[80%]">
-      <Button title="Fechar" styles="bg-red-500" onPress={onClose} />
+    <div className="min-h-[100vh] min-w-[100%] bg-gray p-3 rounded-md flex items-center justify-center flex-col">
+      <Button title="Fechar" styles="bg-red text-textWhite" onPress={onClose} />
 
       <div className="flex flex-col items-center mt-5">
-        <div className="w-full max-w-md bg-white p-6 shadow-md rounded-md max-h-[80vh] overflow-y-auto">
+        <div className="w-full max-w-md bg-textWhite p-6 shadow-md rounded-md max-h-[80vh] overflow-y-auto">
           <h2 className="text-2xl font-semibold mb-6">
             {itemToEdit ? "Editar Item" : "Adicionar Item"}
           </h2>
@@ -197,12 +210,12 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
                 className="w-full p-3 border rounded-md"
               />
               {filteredCategories.length > 0 && (
-                <ul className="absolute z-10 w-full bg-white border mt-1 max-h-40 overflow-y-auto">
+                <ul className="absolute z-10 w-full bg-textWhite border mt-1 max-h-40 overflow-y-auto">
                   {filteredCategories.map((cat, index) => (
                     <li
                       key={index}
                       onClick={() => selectCategory(cat)}
-                      className="p-2 hover:bg-gray-200 cursor-pointer"
+                      className="p-2 hover:bg-bgGreen cursor-pointer"
                     >
                       {cat}
                     </li>
@@ -228,7 +241,9 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
             <textarea
               placeholder="Descrição (Opcional)"
               value={item.description}
-              onChange={(e) => setItem({ ...item, description: e.target.value })}
+              onChange={(e) =>
+                setItem({ ...item, description: e.target.value })
+              }
               className="w-full p-3 border rounded-md"
             />
             <input
@@ -283,14 +298,18 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
                   type="text"
                   placeholder="Nome"
                   value={variant.name}
-                  onChange={(e) => handleVariantChange(index, "name", e.target.value)}
+                  onChange={(e) =>
+                    handleVariantChange(index, "name", e.target.value)
+                  }
                   className="w-full p-2 border rounded-md"
                 />
                 <input
                   type="number"
                   placeholder="Preço"
                   value={variant.price}
-                  onChange={(e) => handleVariantChange(index, "price", e.target.value)}
+                  onChange={(e) =>
+                    handleVariantChange(index, "price", e.target.value)
+                  }
                   className="w-full p-2 border rounded-md"
                 />
                 <div className="flex">
@@ -298,12 +317,16 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
                     type="number"
                     placeholder="Quantidade"
                     value={variant.quantity}
-                    onChange={(e) => handleVariantChange(index, "quantity", e.target.value)}
+                    onChange={(e) =>
+                      handleVariantChange(index, "quantity", e.target.value)
+                    }
                     className="w-full p-2 border rounded-md"
                   />
                   <select
                     value={variant.unit}
-                    onChange={(e) => handleVariantChange(index, "unit", e.target.value)}
+                    onChange={(e) =>
+                      handleVariantChange(index, "unit", e.target.value)
+                    }
                     className="w-full p-2 border rounded-md"
                   >
                     <option value="pcs">pcs</option>
@@ -314,7 +337,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
                 </div>
                 <button
                   onClick={() => handleRemoveVariant(index)}
-                  className="bg-red-500 text-white p-2 rounded-lg hover:underline text-sm mt-1"
+                  className="bg-red text-textWhite p-2 rounded-lg hover:underline text-sm mt-1"
                 >
                   Remover Opção
                 </button>
@@ -323,7 +346,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
 
             <button
               onClick={handleAddVariant}
-              className="w-full mt-3 bg-green-500 text-white rounded-md py-2"
+              className="w-full mt-3 bg-blue text-textWhite rounded-md py-2"
             >
               + Adicionar Opção
             </button>
@@ -331,7 +354,7 @@ const AddMenu = ({ itemToEdit, onClose, onUpdateItems, availableCategories }) =>
             <button
               onClick={handleUpload}
               disabled={loading}
-              className={`w-full py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 ${
+              className={`w-full py-3 bg-bgGreen text-textWhite rounded-md hover:bg-blue-600 ${
                 loading ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
