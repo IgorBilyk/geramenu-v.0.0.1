@@ -1,4 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
+import './index.css';
+
+
 import Login from "./components/pages/Login/Login";
 import AddMenu from "./components/pages/AddMenu/AddMenu";
 import Settings from "./components/pages/settings/Settings";

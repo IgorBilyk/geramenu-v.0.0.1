@@ -109,7 +109,7 @@ const Home = () => {
 
     // Cleanup on unmount
     return () => observer.disconnect();
-  }, [categories]);
+  }, [categories])
 
   return (
     <div>
@@ -171,58 +171,6 @@ const Home = () => {
                       handleDeleteItem={handleDeleteItem}
                       external={false}
                     />
-                    /*  <Card
-                    clasName="w-full sm:w-80 md:w-96 my-4 px-5 mx-auto shadow-lg rounded-lg border"
-                    key={item.id}
-                  >
-                    <CardHeader
-                      shadow={false}
-                      floated={false}
-                      className="h-48 sm:h-56 bg-gray-300"
-                    >
-                      <img
-                        src={item?.image || ""}
-                        alt={item.name}
-                        className="h-full w-full object-cover rounded-t-lg cursor-pointer"
-                        onClick={() => setZoomedImage(item.image)} // Set zoomed image on click
-                      />
-                    </CardHeader>
-                    <CardBody>
-                      <div className="mb-2 flex flex-col sm:flex-row items-center justify-between border-b-2 pb-2">
-                        <Typography color="blue-gray" className="font-medium text-lg sm:text-xl">
-                          {item.name}
-                        </Typography>
-                        <div className="text-center sm:text-right mt-2 sm:mt-0">
-                          <Typography color="blue-gray" className="font-medium text-base">
-                            {item.price}&#8364;
-                          </Typography>
-                          <div className="flex justify-center sm:justify-end mt-1">
-                            <Typography
-                              color="blue-gray"
-                              className="font-small mr-2 text-sm"
-                            >
-                              {item.quantity}
-                            </Typography>
-                            <Typography color="blue-gray" className="font-small text-sm">
-                              {item.unit}
-                            </Typography>
-                          </div>
-                        </div>
-                      </div>
-                    </CardBody>
-                    <div className="flex flex-col sm:flex-row justify-around gap-4 pb-4 px-4">
-                      <CustomButton
-                        title="Editar"
-                        onPress={() => openModal(item)}
-                        styles="w-full sm:w-auto"
-                      />
-                      <CustomButton
-                        title="Remover"
-                        onPress={() => handleDeleteItem(item?.id)}
-                        styles="bg-red-500 w-full sm:w-auto"
-                      />
-                    </div>
-                  </Card> */
                   ))}
               </div>
             </div>
@@ -236,7 +184,9 @@ const Home = () => {
       >
         <FaArrowUp />
       </button>
-      <Toaster />
+      <div>
+        <Toaster />
+      </div>
 
       {isModalOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
@@ -253,7 +203,7 @@ const Home = () => {
       {/* Fullscreen Image Zoom Modal */}
       {zoomedImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-bgGreen bg-opacity-75 flex items-center justify-center z-50"
           onClick={() => setZoomedImage(null)} // Close on click
         >
           <img

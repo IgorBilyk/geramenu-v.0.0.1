@@ -13,6 +13,7 @@ const PreviewExternalPage = () => {
   const [activeCategory, setActiveCategory] = useState("");
   const [restaurantInfo, setRestaurantInfo] = useState(null); // For restaurant info
   const [isInfoExpanded, setIsInfoExpanded] = useState(false); // To toggle expansion
+  const [zoomedImage, setZoomedImage] = useState(null); // For zoomed image
   const topRef = useRef(null);
 
   // Fetch restaurant data
@@ -73,67 +74,76 @@ const PreviewExternalPage = () => {
       <Link to="/" className="my-5">
         <FaArrowLeft className="font-medium text-[2rem] text-bgGreen" />
       </Link>
-           {/* Restaurant Info Section */}
-           {restaurantInfo && (
+
+      {/* Restaurant Info Section */}
+      {restaurantInfo && (
+        <div
+          className={`w-full z-20 p-4 rounded-md transition-transform ${
+            isInfoExpanded ? "h-auto" : "min-h-[80px]"
+          }`}
+        >
           <div
-            className={` w-full z-20 p-4 rounded-md transition-transform ${
-              isInfoExpanded ? "h-auto" : "min-h-[80px]"
-            }`}
+            className="cursor-pointer flex justify-between items-center"
+            onClick={toggleInfoExpansion}
           >
-            <div
-              className="cursor-pointer flex justify-between items-center"
-              onClick={toggleInfoExpansion}
-            >
-              <div className="flex items-center gap-4">
-                {restaurantInfo.imageUrl && (
-                  <img
-                    src={restaurantInfo.imageUrl}
-                    alt="Restaurant"
-                    className="w-16 h-16 object-cover rounded-full"
-                  />
-                )}
-                <div>
-                  <h2 className="text-xl font-bold">{restaurantInfo.restaurantName}</h2>
-                  <p className="text-sm text-bgGreen">
-                    {restaurantInfo.address} 
-                  </p>
-                 <a  href={`tel:${restaurantInfo.phone}`}>{restaurantInfo.phone}</a>
-                </div>
+            <div className="flex items-center gap-4">
+              {restaurantInfo.imageUrl && (
+                <img
+                  src={restaurantInfo.imageUrl}
+                  alt="Restaurant"
+                  className="w-16 h-16 object-cover rounded-full"
+                />
+              )}
+              <div>
+                <h2 className="text-xl font-bold">{restaurantInfo.restaurantName}</h2>
+                <p className="text-sm text-bgGreen">
+                  {restaurantInfo.address}
+                </p>
+                <a href={`tel:${restaurantInfo.phone}`}>{restaurantInfo.phone}</a>
               </div>
-              <button
-                className="text-sm font-medium text-bgGreen"
-              >
-                {isInfoExpanded ? "Mostrar menos" : "Mostrar mais"}
-              </button>
             </div>
-            {isInfoExpanded && (
-              <div className="mt-4 text-bgGreen">
-                <p><strong>Email:</strong> {restaurantInfo.email}</p>
-                <p><strong>WiFi:</strong> {restaurantInfo.wifi}</p>
-                <p><strong>WiFi Password:</strong> {restaurantInfo.wifiPassword}</p>
-                <p><strong>Horas:</strong></p>
-                <ul>
-                  <li>
-                    Almoço: {restaurantInfo.workingHours.lunchOpen} -{" "}
-                    {restaurantInfo.workingHours.lunchClose}
-                  </li>
-                  <li>
-                    Jantar: {restaurantInfo.workingHours.dinnerOpen} -{" "}
-                    {restaurantInfo.workingHours.dinnerClose}
-                  </li>
-                </ul>
-                <p><strong>Encerrado:</strong> {restaurantInfo.workingHours.closedDays.join(", ")}</p>
-                <p><strong>Descrição:</strong> {restaurantInfo.description}</p>
-              </div>
-            )}
+            <button className="text-sm font-medium text-bgGreen">
+              {isInfoExpanded ? "Mostrar menos" : "Mostrar mais"}
+            </button>
           </div>
-        )}
+          {isInfoExpanded && (
+            <div className="mt-4 text-bgGreen">
+              <p>
+                <strong>Email:</strong> {restaurantInfo.email}
+              </p>
+              <p>
+                <strong>WiFi:</strong> {restaurantInfo.wifi}
+              </p>
+              <p>
+                <strong>WiFi Password:</strong> {restaurantInfo.wifiPassword}
+              </p>
+              <p>
+                <strong>Horas:</strong>
+              </p>
+              <ul>
+                <li>
+                  Almoço: {restaurantInfo.workingHours.lunchOpen} -{" "}
+                  {restaurantInfo.workingHours.lunchClose}
+                </li>
+                <li>
+                  Jantar: {restaurantInfo.workingHours.dinnerOpen} -{" "}
+                  {restaurantInfo.workingHours.dinnerClose}
+                </li>
+              </ul>
+              <p>
+                <strong>Encerrado:</strong> {restaurantInfo.workingHours.closedDays.join(", ")}
+              </p>
+              <p>
+                <strong>Descrição:</strong> {restaurantInfo.description}
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       <div ref={topRef}>
-      
         {/* Category Navigation */}
         <nav className="sticky top-[0%] left-0 w-full z-10 bg-gray-[400]">
-       
           <div className="flex justify-center space-x-4 py-5">
             {categories.map((category) => (
               <button
@@ -142,7 +152,7 @@ const PreviewExternalPage = () => {
                 className={`px-4 py-2 rounded-full ${
                   activeCategory === category
                     ? "bg-bgGreen text-textWhite"
-                    : "text-bgGreen font-bold border "
+                    : "text-bgGreen font-bold border"
                 }`}
               >
                 {category}
@@ -152,8 +162,8 @@ const PreviewExternalPage = () => {
         </nav>
 
         {/* Menu Items */}
-        <div className="container mx-auto pt-20 mt-20 px-4 text-bgGreen">
-          <h1 className="text-4xl font-bold mb-8">Menu</h1>
+        <div className="container mx-auto pt-5 px-4 text-bgGreen">
+          <h1 className="text-4xl font-bold mb-8 text-center">Menu</h1>
           {activeCategory && (
             <div className="flex flex-col items-center">
               <h2 className="text-2xl font-bold mb-4">{activeCategory}</h2>
@@ -161,16 +171,15 @@ const PreviewExternalPage = () => {
                 {items
                   .filter(
                     (item) =>
-                      item.category === activeCategory &&
-                      item.outOfStock === false
+                      item.category === activeCategory && item.outOfStock === false
                   )
                   .map((item) => (
                     <CardComponent
                       key={item.id}
                       item={item}
                       external="true"
-/*                       setZoomedImage={(image) => setZoomedImage(image)}
- */                    />
+                      setZoomedImage={(image) => setZoomedImage(image)} // Pass handler
+                    />
                   ))}
               </div>
             </div>
@@ -179,21 +188,24 @@ const PreviewExternalPage = () => {
       </div>
 
       {/* Zoomed Image */}
-    {/*   {zoomedImage && (
+      {zoomedImage && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-bgGreen bg-opacity-75 flex items-center justify-center z-50"
           onClick={() => setZoomedImage(null)}
         >
-          <img src={zoomedImage} alt="Zoomed" className="w-full h-full object-contain" />
+          <img
+            src={zoomedImage}
+            alt="Zoomed"
+            className="w-full h-full object-contain"
+          />
         </div>
-      )} */}
+      )}
 
-    
       <button
         onClick={scrollToTop}
         className="fixed bottom-[120px] right-4 p-3 rounded-full bg-bgGreen text-white shadow-lg"
       >
-        <FaArrowUp className="text-textWhite"/>
+        <FaArrowUp className="text-textWhite" />
       </button>
     </div>
   );

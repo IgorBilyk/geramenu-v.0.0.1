@@ -40,7 +40,6 @@ const AddMenu = ({
 
   // Initialize form for editing
   useEffect(() => {
-    console.log("from AddItem", itemToEdit);
     if (itemToEdit) {
       setItem({
         category: itemToEdit.category || "",
@@ -188,7 +187,7 @@ const AddMenu = ({
     setVariants([]);
     setError("");
   };
-
+  
   return (
     <div className="min-h-[100vh] min-w-[100%] bg-gray p-3 rounded-md flex items-center justify-center flex-col">
       <Button title="Fechar" styles="bg-red text-textWhite" onPress={onClose} />

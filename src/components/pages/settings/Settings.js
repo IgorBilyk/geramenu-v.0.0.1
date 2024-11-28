@@ -7,7 +7,6 @@ import { successMessage, warningMessage } from "../../../handlers/toastHandler";
 
 import { Toaster } from "sonner";
 
-
 const Settings = () => {
   const [formData, setFormData] = useState({
     restaurantName: "",
@@ -15,7 +14,7 @@ const Settings = () => {
     phone: "",
     email: "",
     wifi: "",
-    wifiPassword:"",
+    wifiPassword: "",
     workingHours: {
       lunchOpen: "",
       lunchClose: "",
@@ -87,9 +86,9 @@ const Settings = () => {
         ...formData,
         imageUrl,
       });
-      successMessage('Informações foram adicionadas!')
+      successMessage("Informações foram adicionadas!");
     } catch (error) {
-      warningMessage('Algo correu errado, tente novamente!')
+      warningMessage("Algo correu errado, tente novamente!");
     }
   };
 
@@ -153,7 +152,7 @@ const Settings = () => {
             />
           </div>
           <div>
-            <label className="block mb-2">Wi-Fi Password:</label>
+            <label className="block mb-2">Wi-Fi Senha:</label>
             <input
               type="text"
               name="wifiPassword"
@@ -205,13 +204,13 @@ const Settings = () => {
             <label className="block mb-2">Encerrado:</label>
             <div className="flex flex-wrap gap-2">
               {[
-                "Sunday",
-                "Monday",
-                "Tuesday",
-                "Wednesday",
-                "Thursday",
-                "Friday",
-                "Saturday",
+                "Domingo",
+                "Segunda-feira",
+                "Terça-feira",
+                "Quarta-feira",
+                "Quinta-feira",
+                "Sexta-feira",
+                "Sábado",
               ].map((day) => (
                 <label key={day} className="flex items-center gap-2">
                   <input
@@ -246,7 +245,7 @@ const Settings = () => {
           </div>
           <button
             type="submit"
-            className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
+            className="bg-bgGreen text-textWhite px-6 py-2 rounded-md"
           >
             Guardar
           </button>
