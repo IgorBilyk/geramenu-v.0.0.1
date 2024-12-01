@@ -169,7 +169,8 @@ const PreviewExternalPage = () => {
       <div ref={topRef}>
         {/* Category Navigation */}
         <nav className="sticky top-[0%] left-0 w-full z-10 bg-gray-[400]">
-          <div className="flex justify-center space-x-4 py-5 flex-nowrap overflow-x-auto overflow-y-hidden scrollbar">
+        <div className="flex justify-start space-x-4 py-5 pl-5 pr-2 flex-nowrap overflow-x-auto overflow-y-hidden scrollbar scroll-px-4 bg-gray">
+
             {categories.map((category) => (
               <button
                 key={category}
