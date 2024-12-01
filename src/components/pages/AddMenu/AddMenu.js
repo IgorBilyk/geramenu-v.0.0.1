@@ -296,6 +296,26 @@ const AddMenu = ({
               onChange={(e) => setItem({ ...item, price: e.target.value })}
               className="w-full p-3 border rounded-md"
             />
+            <div className="flex space-x-2">
+              <input
+                type="number"
+                placeholder="Quantidade"
+                value={item.quantity}
+                onChange={(e) => setItem({ ...item, quantity: e.target.value })}
+                className="w-full p-3 border rounded-md"
+                required
+              />
+              <select
+                value={item.unit}
+                onChange={(e) => setItem({ ...item, unit: e.target.value })}
+                className="p-3 border rounded-md"
+              >
+                <option value="pcs">pcs</option>
+                <option value="g">g</option>
+                <option value="ml">ml</option>
+                <option value="pessoas">pessoas</option>
+              </select>
+            </div>
             <textarea
               placeholder="Descrição (Opcional)"
               value={item.description}
@@ -317,25 +337,7 @@ const AddMenu = ({
               />
             </div>
 
-            <div className="flex space-x-2">
-              <input
-                type="number"
-                placeholder="Quantidade"
-                value={item.quantity}
-                onChange={(e) => setItem({ ...item, quantity: e.target.value })}
-                className="w-full p-3 border rounded-md"
-              />
-              <select
-                value={item.unit}
-                onChange={(e) => setItem({ ...item, unit: e.target.value })}
-                className="p-3 border rounded-md"
-              >
-                <option value="pcs">pcs</option>
-                <option value="g">g</option>
-                <option value="ml">ml</option>
-                <option value="pessoas">pessoas</option>
-              </select>
-            </div>
+            
 
             <div className="flex items-center">
               <input

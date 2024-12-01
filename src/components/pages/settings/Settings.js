@@ -13,6 +13,7 @@ const Settings = () => {
     address: "",
     phone: "",
     email: "",
+    website: "",
     wifi: "",
     wifiPassword: "",
     workingHours: {
@@ -109,6 +110,7 @@ const Settings = () => {
               value={formData.restaurantName}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-md"
+              required
             />
           </div>
           <div>
@@ -119,6 +121,7 @@ const Settings = () => {
               value={formData.address}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-md"
+              required
             />
           </div>
           <div>
@@ -129,6 +132,7 @@ const Settings = () => {
               value={formData.phone}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-md"
+              required
             />
           </div>
           <div>
@@ -137,6 +141,16 @@ const Settings = () => {
               type="email"
               name="email"
               value={formData.email}
+              onChange={handleChange}
+              className="w-full px-4 py-2 border rounded-md"
+            />
+          </div>
+          <div>
+            <label className="block mb-2">Website:</label>
+            <input
+              type="text"
+              name="website"
+              value={formData.website}
               onChange={handleChange}
               className="w-full px-4 py-2 border rounded-md"
             />

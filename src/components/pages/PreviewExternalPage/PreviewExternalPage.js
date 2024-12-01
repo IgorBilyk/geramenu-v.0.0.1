@@ -53,13 +53,17 @@ const PreviewExternalPage = () => {
         }));
 
         setItems(menuItems);
-        
+
         const uniqueCategories = [
-          ...new Set(menuItems.filter(item => !item.outOfStock ).map((item) => item.category)),
+          ...new Set(
+            menuItems
+              .filter((item) => !item.outOfStock)
+              .map((item) => item.category)
+          ),
         ];
         setCategories(uniqueCategories);
-        
-       /*  console.log("from previewext", categories); */
+
+        /*  console.log("from previewext", categories); */
         if (uniqueCategories.length > 0) {
           setActiveCategory(uniqueCategories[0]);
         }
@@ -78,11 +82,11 @@ const PreviewExternalPage = () => {
   const scrollToTop = () => {
     topRef.current.scrollIntoView({ behavior: "smooth" });
   };
-  console.log(items)
+  console.log(items);
 
   return (
     <div>
-     {/*  <Link to="/" className="my-5">
+      {/*  <Link to="/" className="my-5">
         <FaArrowLeft className="font-medium text-[2rem] text-bgGreen" />
       </Link> */}
 
@@ -97,7 +101,7 @@ const PreviewExternalPage = () => {
             className="cursor-pointer flex justify-between items-center"
             onClick={toggleInfoExpansion}
           >
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 text-bgGreen">
               {restaurantInfo.imageUrl && (
                 <img
                   src={restaurantInfo.imageUrl}
@@ -110,9 +114,16 @@ const PreviewExternalPage = () => {
                   {restaurantInfo.restaurantName}
                 </h2>
                 <p className="text-sm text-bgGreen">{restaurantInfo.address}</p>
-                <a href={`tel:${restaurantInfo.phone}`}>
-                  {restaurantInfo.phone}
-                </a>
+                <p><strong>Tel: </strong>
+                  <a href={`tel:${restaurantInfo.phone}`}>
+                    {restaurantInfo.phone}
+                  </a>
+                </p>
+                <p>
+                  {" "}
+                  <strong>Website: </strong>
+                  <a href={restaurantInfo.website} target="_blank">{restaurantInfo.website}</a>
+                </p>
               </div>
             </div>
             <button className="text-sm font-medium text-bgGreen">
@@ -158,7 +169,7 @@ const PreviewExternalPage = () => {
       <div ref={topRef}>
         {/* Category Navigation */}
         <nav className="sticky top-[0%] left-0 w-full z-10 bg-gray-[400]">
-          <div className="flex justify-center space-x-4 py-5">
+          <div className="flex justify-center space-x-4 py-5 flex-nowrap overflow-x-auto overflow-y-hidden scrollbar">
             {categories.map((category) => (
               <button
                 key={category}
@@ -196,7 +207,6 @@ const PreviewExternalPage = () => {
                       setZoomedImage={(image) => setZoomedImage(image)}
                     />
                   ))}
-          
               </div>
             </div>
           )}
