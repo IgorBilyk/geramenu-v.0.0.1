@@ -22,7 +22,7 @@ export default function CardComponent({
 
   return (
     <Card
-      className="w-full sm:w-80 md:w-96 my-4 px-5 mx-auto shadow-lg rounded-lg"
+      className="sm:w-full my-4 px-5 shadow-lg rounded-lg lg:w-[25%]"
       key={id}
     >
       <CardHeader
@@ -40,7 +40,7 @@ export default function CardComponent({
       <CardBody className="py-0 text-bgGreen">
         <div className="mb-2 flex sm:flex-row items-center justify-between border-b-2 pb-2">
           <Typography
-            color="bgGreen"
+            color="text-bgGreen"
             className="font-medium text-lg sm:text-xl"
           >
             {name}
@@ -64,7 +64,7 @@ export default function CardComponent({
       {variants.length > 0 &&
         variants.map((item, index) => {
           return (
-            <CardBody className="py-0" key={index} text-bgGreen>
+            <CardBody className="py-0 text-bgGreen" key={index}>
               <div className="mb-2 flex sm:flex-row items-center justify-between border-b-2 pb-2">
                 <Typography
                   color="blue-gray"

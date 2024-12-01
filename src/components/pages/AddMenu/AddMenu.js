@@ -26,7 +26,7 @@ const AddMenu = ({
     price: "",
     description: "",
     options: "",
-    image: null,
+    image: "https://via.placeholder.com/150",
     outOfStock: false,
     quantity: "",
     unit: "pcs",
@@ -38,6 +38,7 @@ const AddMenu = ({
   const [error, setError] = useState("");
   const [filteredCategories, setFilteredCategories] = useState([]);
 
+  console.log(itemToEdit)
   // Initialize form for editing
   useEffect(() => {
     if (itemToEdit) {
@@ -47,7 +48,7 @@ const AddMenu = ({
         price: itemToEdit.price || "",
         description: itemToEdit.description || "",
         options: itemToEdit.options || "",
-        image: itemToEdit.image || null,
+        image: itemToEdit.image || imagePreview,
         outOfStock: itemToEdit.outOfStock || false,
         quantity: itemToEdit.quantity || "",
         unit: itemToEdit.unit || "pcs",
@@ -112,7 +113,7 @@ const AddMenu = ({
   };
 
   // Upload item to Firestore and Storage
-  const handleUpload = async () => {
+  /* const handleUpload = async () => {
     setError("");
 
     if (!item.category || !item.name || !item.price) {
@@ -168,8 +169,66 @@ const AddMenu = ({
     } finally {
       setLoading(false);
     }
-  };
+  }; */
 
+  const handleUpload = async () => {
+    setError("");
+  
+    if (!item.category || !item.name || !item.price) {
+      setError("Por favor, preencha todos os campos obrigatórios.");
+      return;
+    }
+  
+    if (variants.some((v) => !v.name || !v.price || !v.quantity)) {
+      setError("Por favor, preencha todos os campos das variantes.");
+      return;
+    }
+  
+    setLoading(true);
+  
+    try {
+      const userId = auth.currentUser?.uid;
+      if (!userId) throw new Error("Usuário não autenticado.");
+  
+      let imageUrl = itemToEdit?.image || placeholderImage; // Default to existing image if editing
+  
+      if (item.image && typeof item.image !== "string") {
+        // If a new image is selected, upload it
+        const imageRef = ref(storage, `menuImages/${userId}/${item.image.name}`);
+        await uploadBytes(imageRef, item.image);
+        imageUrl = await getDownloadURL(imageRef);
+      }
+  
+      const itemData = {
+        ...item,
+        image: imageUrl,
+        userId,
+        variants,
+        createdAt: serverTimestamp(),
+        modifiedAt: serverTimestamp(),
+      };
+  
+      if (itemToEdit?.id) {
+        // Editing an existing item
+        await setDoc(doc(db, "menuItems", itemToEdit.id), itemData, {
+          merge: true,
+        });
+      } else {
+        // Adding a new item
+        await addDoc(collection(db, "menuItems"), itemData);
+      }
+  
+      successMessage("Item adicionado com sucesso!");
+      resetForm();
+      onClose();
+    } catch (error) {
+      console.error("Error adding item:", error);
+      toast.error("Falha ao adicionar item. Tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   // Reset form fields
   const resetForm = () => {
     setItem({

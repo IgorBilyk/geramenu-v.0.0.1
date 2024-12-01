@@ -159,7 +159,7 @@ const Home = () => {
               data-category={category}
               className="my-8"
             >
-              <div className="flex justify-center items-center flex-col">
+              <div className="flex flex-col w-full">
                 {items
                   .filter((item) => item.category === category)
                   .map((item) => (
@@ -184,7 +184,7 @@ const Home = () => {
       >
         <FaArrowUp />
       </button>
-      <div>
+      <div className="bg-bgGreen">
         <Toaster />
       </div>
 

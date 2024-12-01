@@ -1,6 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { db } from "../../../firebase/firebase";
-import { collection, query, where, getDocs, doc, getDoc } from "firebase/firestore";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+} from "firebase/firestore";
 import { useParams, Link } from "react-router-dom";
 import { FaArrowLeft, FaArrowUp } from "react-icons/fa";
 
@@ -46,10 +53,13 @@ const PreviewExternalPage = () => {
         }));
 
         setItems(menuItems);
-
-        const uniqueCategories = [...new Set(menuItems.map((item) => item.category))];
+        
+        const uniqueCategories = [
+          ...new Set(menuItems.filter(item => !item.outOfStock ).map((item) => item.category)),
+        ];
         setCategories(uniqueCategories);
-
+        
+       /*  console.log("from previewext", categories); */
         if (uniqueCategories.length > 0) {
           setActiveCategory(uniqueCategories[0]);
         }
@@ -68,12 +78,13 @@ const PreviewExternalPage = () => {
   const scrollToTop = () => {
     topRef.current.scrollIntoView({ behavior: "smooth" });
   };
+  console.log(items)
 
   return (
     <div>
-      <Link to="/" className="my-5">
+     {/*  <Link to="/" className="my-5">
         <FaArrowLeft className="font-medium text-[2rem] text-bgGreen" />
-      </Link>
+      </Link> */}
 
       {/* Restaurant Info Section */}
       {restaurantInfo && (
@@ -95,11 +106,13 @@ const PreviewExternalPage = () => {
                 />
               )}
               <div>
-                <h2 className="text-xl font-bold">{restaurantInfo.restaurantName}</h2>
-                <p className="text-sm text-bgGreen">
-                  {restaurantInfo.address}
-                </p>
-                <a href={`tel:${restaurantInfo.phone}`}>{restaurantInfo.phone}</a>
+                <h2 className="text-xl font-bold">
+                  {restaurantInfo.restaurantName}
+                </h2>
+                <p className="text-sm text-bgGreen">{restaurantInfo.address}</p>
+                <a href={`tel:${restaurantInfo.phone}`}>
+                  {restaurantInfo.phone}
+                </a>
               </div>
             </div>
             <button className="text-sm font-medium text-bgGreen">
@@ -131,7 +144,8 @@ const PreviewExternalPage = () => {
                 </li>
               </ul>
               <p>
-                <strong>Encerrado:</strong> {restaurantInfo.workingHours.closedDays.join(", ")}
+                <strong>Encerrado:</strong>{" "}
+                {restaurantInfo.workingHours.closedDays.join(", ")}
               </p>
               <p>
                 <strong>Descrição:</strong> {restaurantInfo.description}
@@ -167,20 +181,22 @@ const PreviewExternalPage = () => {
           {activeCategory && (
             <div className="flex flex-col items-center">
               <h2 className="text-2xl font-bold mb-4">{activeCategory}</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="flex flex-col w-full">
                 {items
                   .filter(
                     (item) =>
-                      item.category === activeCategory && item.outOfStock === false
+                      item.category === activeCategory &&
+                      item.outOfStock === false
                   )
                   .map((item) => (
                     <CardComponent
                       key={item.id}
                       item={item}
                       external="true"
-                      setZoomedImage={(image) => setZoomedImage(image)} // Pass handler
+                      setZoomedImage={(image) => setZoomedImage(image)}
                     />
                   ))}
+          
               </div>
             </div>
           )}
