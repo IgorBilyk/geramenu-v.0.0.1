@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { db } from "../../../firebase/firebase";
 import {
   collection,
@@ -8,20 +8,24 @@ import {
   doc,
   getDoc,
 } from "firebase/firestore";
-import { useParams, Link } from "react-router-dom";
-import { FaArrowLeft, FaArrowUp } from "react-icons/fa";
-
+import { useParams } from "react-router-dom";
+import { FaArrowUp } from "react-icons/fa";
 import CardComponent from "./CardComponent";
 
+const ITEMS_PER_PAGE = 10;
+
 const PreviewExternalPage = () => {
-  const { userId } = useParams(); // Extract user ID from URL
-  const [items, setItems] = useState([]);
+  const { userId } = useParams();
+  const [itemsCache, setItemsCache] = useState({});
+  const [visibleItems, setVisibleItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState("");
-  const [restaurantInfo, setRestaurantInfo] = useState(null); // For restaurant info
-  const [isInfoExpanded, setIsInfoExpanded] = useState(false); // To toggle expansion
+  const [restaurantInfo, setRestaurantInfo] = useState(null);
+  const [isFetching, setIsFetching] = useState(false);
+  const [scrollOffset, setScrollOffset] = useState(0);
   const [zoomedImage, setZoomedImage] = useState(null); // For zoomed image
-  const topRef = useRef(null);
+
+  const containerRef = useRef();
 
   // Fetch restaurant data
   useEffect(() => {
@@ -40,19 +44,18 @@ const PreviewExternalPage = () => {
     fetchRestaurantData();
   }, [userId]);
 
-  // Fetch menu items
+  // Fetch categories and items for the initial active category
   useEffect(() => {
-    const fetchItems = async () => {
+    const fetchCategoriesAndItems = async () => {
       try {
         const itemsRef = collection(db, "menuItems");
         const q = query(itemsRef, where("userId", "==", userId));
         const querySnapshot = await getDocs(q);
+
         const menuItems = querySnapshot.docs.map((doc) => ({
           id: doc.id,
           ...doc.data(),
         }));
-
-        setItems(menuItems);
 
         const uniqueCategories = [
           ...new Set(
@@ -61,159 +64,154 @@ const PreviewExternalPage = () => {
               .map((item) => item.category)
           ),
         ];
+
         setCategories(uniqueCategories);
 
-        /*  console.log("from previewext", categories); */
         if (uniqueCategories.length > 0) {
-          setActiveCategory(uniqueCategories[0]);
+          const initialCategory = uniqueCategories[0];
+          setActiveCategory(initialCategory);
+          fetchCategoryItems(initialCategory, 0);
         }
       } catch (error) {
-        console.error("Failed to fetch menu items:", error);
+        console.error("Failed to fetch categories or items:", error);
       }
     };
 
-    fetchItems();
+    fetchCategoriesAndItems();
   }, [userId]);
 
-  const toggleInfoExpansion = () => {
-    setIsInfoExpanded(!isInfoExpanded);
+  // Fetch items for a specific category with pagination
+  const fetchCategoryItems = async (category, offset) => {
+    if (itemsCache[category]?.length > offset) {
+      console.log("From Cache");
+      setVisibleItems((prev) => [
+        ...prev,
+        ...itemsCache[category].slice(offset, offset + ITEMS_PER_PAGE),
+      ]);
+      return;
+    }
+
+    setIsFetching(true);
+    try {
+      const itemsRef = collection(db, "menuItems");
+      const q = query(
+        itemsRef,
+        where("userId", "==", userId),
+        where("category", "==", category),
+        where("outOfStock", "==", false)
+      );
+      const querySnapshot = await getDocs(q);
+
+      const fetchedItems = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setItemsCache((prev) => ({
+        ...prev,
+        [category]: [...(prev[category] || []), ...fetchedItems],
+      }));
+
+      setVisibleItems((prev) => [
+        ...prev,
+        ...fetchedItems.slice(offset, offset + ITEMS_PER_PAGE),
+      ]);
+      console.log("From DB");
+    } catch (error) {
+      console.error("Failed to fetch category items:", error);
+    } finally {
+      setIsFetching(false);
+    }
   };
 
-  const scrollToTop = () => {
-    topRef.current.scrollIntoView({ behavior: "smooth" });
+  // Handle category change
+  const handleCategoryChange = (category) => {
+    setActiveCategory(category);
+    setScrollOffset(0);
+    setVisibleItems([]);
+    if (itemsCache[category]?.length) {
+      console.log("from cache");
+      setVisibleItems(itemsCache[category].slice(0, ITEMS_PER_PAGE));
+    } else {
+      fetchCategoryItems(category, 0);
+      console.log("from db");
+    }
   };
-  console.log(items);
+
+  // Handle lazy loading on scroll
+  const handleScroll = useCallback(() => {
+    if (
+      containerRef.current &&
+      containerRef.current.scrollTop + containerRef.current.clientHeight >=
+        containerRef.current.scrollHeight - 100 &&
+      !isFetching
+    ) {
+      setScrollOffset((prevOffset) => {
+        const newOffset = prevOffset + ITEMS_PER_PAGE;
+        fetchCategoryItems(activeCategory, newOffset);
+        return newOffset;
+      });
+    }
+  }, [activeCategory, isFetching]);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
+      return () => container.removeEventListener("scroll", handleScroll);
+    }
+  }, [handleScroll]);
 
   return (
     <div>
-      {/*  <Link to="/" className="my-5">
-        <FaArrowLeft className="font-medium text-[2rem] text-bgGreen" />
-      </Link> */}
-
-      {/* Restaurant Info Section */}
+      {/* Restaurant Info */}
       {restaurantInfo && (
-        <div
-          className={`w-full z-20 p-4 rounded-md transition-transform ${
-            isInfoExpanded ? "h-auto" : "min-h-[80px]"
-          }`}
-        >
-          <div
-            className="cursor-pointer flex justify-between items-center"
-            onClick={toggleInfoExpansion}
-          >
-            <div className="flex items-center gap-4 text-bgGreen">
-              {restaurantInfo.imageUrl && (
-                <img
-                  src={restaurantInfo.imageUrl}
-                  alt="Restaurant"
-                  className="w-16 h-16 object-cover rounded-full"
-                />
-              )}
-              <div>
-                <h2 className="text-xl font-bold">
-                  {restaurantInfo.restaurantName}
-                </h2>
-                <p className="text-sm text-bgGreen">{restaurantInfo.address}</p>
-                <p><strong>Tel: </strong>
-                  <a href={`tel:${restaurantInfo.phone}`}>
-                    {restaurantInfo.phone}
-                  </a>
-                </p>
-                <p>
-                  {" "}
-                  <strong>Website: </strong>
-                  <a href={restaurantInfo.website} target="_blank">{restaurantInfo.website}</a>
-                </p>
-              </div>
+        <div className="w-full p-4 rounded-md">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold">
+                {restaurantInfo.restaurantName}
+              </h2>
+              <p>{restaurantInfo.address}</p>
             </div>
-            <button className="text-sm font-medium text-bgGreen">
-              {isInfoExpanded ? "Mostrar menos" : "Mostrar mais"}
-            </button>
           </div>
-          {isInfoExpanded && (
-            <div className="mt-4 text-bgGreen">
-              <p>
-                <strong>Email:</strong> {restaurantInfo.email}
-              </p>
-              <p>
-                <strong>WiFi:</strong> {restaurantInfo.wifi}
-              </p>
-              <p>
-                <strong>WiFi Password:</strong> {restaurantInfo.wifiPassword}
-              </p>
-              <p>
-                <strong>Horas:</strong>
-              </p>
-              <ul>
-                <li>
-                  Almoço: {restaurantInfo.workingHours.lunchOpen} -{" "}
-                  {restaurantInfo.workingHours.lunchClose}
-                </li>
-                <li>
-                  Jantar: {restaurantInfo.workingHours.dinnerOpen} -{" "}
-                  {restaurantInfo.workingHours.dinnerClose}
-                </li>
-              </ul>
-              <p>
-                <strong>Encerrado:</strong>{" "}
-                {restaurantInfo.workingHours.closedDays.join(", ")}
-              </p>
-              <p>
-                <strong>Descrição:</strong> {restaurantInfo.description}
-              </p>
-            </div>
-          )}
         </div>
       )}
 
-      <div ref={topRef}>
-        {/* Category Navigation */}
-        <nav className="sticky top-[0%] left-0 w-full z-10 bg-gray-[400]">
-        <div className="flex justify-start space-x-4 py-5 pl-5 pr-2 flex-nowrap overflow-x-auto overflow-y-hidden scrollbar scroll-px-4 bg-gray">
-
-            {categories.map((category) => (
-              <button
-                key={category}
-                onClick={() => setActiveCategory(category)}
-                className={`px-4 py-2 rounded-full ${
-                  activeCategory === category
-                    ? "bg-bgGreen text-textWhite"
-                    : "text-bgGreen font-bold border"
-                }`}
-              >
-                {category}
-              </button>
-            ))}
-          </div>
-        </nav>
-
-        {/* Menu Items */}
-        <div className="container mx-auto pt-5 px-4 text-bgGreen">
-          <h1 className="text-4xl font-bold mb-8 text-center">Menu</h1>
-          {activeCategory && (
-            <div className="flex flex-col items-center">
-              <h2 className="text-2xl font-bold mb-4">{activeCategory}</h2>
-              <div className="flex flex-col w-full">
-                {items
-                  .filter(
-                    (item) =>
-                      item.category === activeCategory &&
-                      item.outOfStock === false
-                  )
-                  .map((item) => (
-                    <CardComponent
-                      key={item.id}
-                      item={item}
-                      external="true"
-                      setZoomedImage={(image) => setZoomedImage(image)}
-                    />
-                  ))}
-              </div>
-            </div>
-          )}
+      {/* Categories */}
+      <nav className="sticky top-0 bg-gray-100 z-10">
+        <div className="flex overflow-x-auto py-2">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => handleCategoryChange(category)}
+              className={`px-4 py-2 ${
+                activeCategory === category
+                  ? "bg-bgGreen text-textWhite rounded-lg"
+                  : ""
+              }`}
+            >
+              {category}
+            </button>
+          ))}
         </div>
-      </div>
+      </nav>
 
+      {/* Items */}
+      <div
+        ref={containerRef}
+        className="container mx-auto h-[70vh] overflow-y-auto"
+      >
+        {visibleItems.map((item) => (
+          <CardComponent
+            key={item.id}
+            item={item}
+            external="true"
+            setZoomedImage={(image) => setZoomedImage(image)}
+          />
+        ))}
+        {isFetching && <p>Loading more items...</p>}
+      </div>
       {/* Zoomed Image */}
       {zoomedImage && (
         <div
@@ -228,11 +226,13 @@ const PreviewExternalPage = () => {
         </div>
       )}
 
+      {/* Scroll to Top */}
       <button
-        onClick={scrollToTop}
-        className="fixed bottom-[120px] right-4 p-3 rounded-full bg-bgGreen text-white shadow-lg"
+        onClick={() =>
+          containerRef.current.scrollTo({ top: 0, behavior: "smooth" })
+        }
       >
-        <FaArrowUp className="text-textWhite" />
+        <FaArrowUp />
       </button>
     </div>
   );
