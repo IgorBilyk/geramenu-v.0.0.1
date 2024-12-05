@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
 import { db, storage, auth } from "../../../firebase/firebase";
+
+import imageCompression from "browser-image-compression";
+
 import {
   collection,
   doc,
@@ -38,7 +41,7 @@ const AddMenu = ({
   const [error, setError] = useState("");
   const [filteredCategories, setFilteredCategories] = useState([]);
 
-  console.log(itemToEdit)
+  console.log(itemToEdit);
   // Initialize form for editing
   useEffect(() => {
     if (itemToEdit) {
@@ -59,8 +62,8 @@ const AddMenu = ({
   }, [itemToEdit]);
 
   // Handle file selection and preview
-  const handleFileChange = (e) => {
-    const file = e.target.files[0];
+  const handleFileChange = async (e) => {
+    /*  const file = e.target.files[0];
     const maxSizeMB = 3;
 
     if (file) {
@@ -70,6 +73,33 @@ const AddMenu = ({
       }
       setItem({ ...item, image: file });
       setImagePreview(URL.createObjectURL(file));
+    } */
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    const maxSizeMB = 3; // Maximum file size in MB before compression
+
+    try {
+      // Compression options
+      const options = {
+        maxSizeMB: 0.5, // Target size in MB (adjust as needed)
+        maxWidthOrHeight: 1024, // Resize to fit within these dimensions
+        useWebWorker: true, // Use web workers for faster compression
+      };
+
+      // Compress the image
+      const compressedFile = await imageCompression(file, options);
+
+      // Update state with compressed file
+      setItem({ ...item, image: compressedFile });
+
+      // Preview the compressed image
+      const compressedPreview = URL.createObjectURL(compressedFile);
+      setImagePreview(compressedPreview);
+    } catch (error) {
+      console.error("Error while compressing the image:", error);
+      toast.error("Erro ao compactar imagem. Tente novamente.");
     }
   };
 
@@ -173,32 +203,35 @@ const AddMenu = ({
 
   const handleUpload = async () => {
     setError("");
-  
+
     if (!item.category || !item.name || !item.price) {
       setError("Por favor, preencha todos os campos obrigatórios.");
       return;
     }
-  
+
     if (variants.some((v) => !v.name || !v.price || !v.quantity)) {
       setError("Por favor, preencha todos os campos das variantes.");
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       const userId = auth.currentUser?.uid;
       if (!userId) throw new Error("Usuário não autenticado.");
-  
+
       let imageUrl = itemToEdit?.image || placeholderImage; // Default to existing image if editing
-  
+
       if (item.image && typeof item.image !== "string") {
         // If a new image is selected, upload it
-        const imageRef = ref(storage, `menuImages/${userId}/${item.image.name}`);
+        const imageRef = ref(
+          storage,
+          `menuImages/${userId}/${item.image.name}`
+        );
         await uploadBytes(imageRef, item.image);
         imageUrl = await getDownloadURL(imageRef);
       }
-  
+
       const itemData = {
         ...item,
         image: imageUrl,
@@ -207,7 +240,7 @@ const AddMenu = ({
         createdAt: serverTimestamp(),
         modifiedAt: serverTimestamp(),
       };
-  
+
       if (itemToEdit?.id) {
         // Editing an existing item
         await setDoc(doc(db, "menuItems", itemToEdit.id), itemData, {
@@ -217,7 +250,7 @@ const AddMenu = ({
         // Adding a new item
         await addDoc(collection(db, "menuItems"), itemData);
       }
-  
+
       successMessage("Item adicionado com sucesso!");
       resetForm();
       onClose();
@@ -228,7 +261,7 @@ const AddMenu = ({
       setLoading(false);
     }
   };
-  
+
   // Reset form fields
   const resetForm = () => {
     setItem({
@@ -246,7 +279,7 @@ const AddMenu = ({
     setVariants([]);
     setError("");
   };
-  
+
   return (
     <div className="min-h-[100vh] min-w-[100%] bg-gray p-3 rounded-md flex items-center justify-center flex-col">
       <Button title="Fechar" styles="bg-red text-textWhite" onPress={onClose} />
@@ -336,8 +369,6 @@ const AddMenu = ({
                 className="w-full h-40 object-cover rounded-md"
               />
             </div>
-
-            
 
             <div className="flex items-center">
               <input

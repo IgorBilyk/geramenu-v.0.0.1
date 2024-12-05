@@ -22,7 +22,7 @@ export default function CardComponent({
 
   return (
     <Card
-      className="sm:w-full my-4 px-5 shadow-lg rounded-lg lg:w-[25%]"
+      className="sm:w-full my-4 px-5 shadow-lg rounded-lg lg:w-[50%]"
       key={id}
     >
       <CardHeader
@@ -40,8 +40,8 @@ export default function CardComponent({
       <CardBody className="py-0 text-bgGreen">
         <div className="mb-2 flex sm:flex-row items-center justify-between border-b-2 pb-2">
           <Typography
-            color="text-bgGreen"
-            className="font-medium text-lg sm:text-xl"
+           
+            className="font-medium text-lg sm:text-xl text-bgGreen"
           >
             {name}
           </Typography>

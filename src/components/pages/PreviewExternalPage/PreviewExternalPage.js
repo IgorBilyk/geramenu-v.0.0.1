@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { db } from "../../../firebase/firebase";
 import {
   collection,
@@ -12,8 +12,6 @@ import { useParams } from "react-router-dom";
 import { FaArrowUp } from "react-icons/fa";
 import CardComponent from "./CardComponent";
 
-const ITEMS_PER_PAGE = 10;
-
 const PreviewExternalPage = () => {
   const { userId } = useParams();
   const [itemsCache, setItemsCache] = useState({});
@@ -22,8 +20,8 @@ const PreviewExternalPage = () => {
   const [activeCategory, setActiveCategory] = useState("");
   const [restaurantInfo, setRestaurantInfo] = useState(null);
   const [isFetching, setIsFetching] = useState(false);
-  const [scrollOffset, setScrollOffset] = useState(0);
   const [zoomedImage, setZoomedImage] = useState(null); // For zoomed image
+  const [isInfoExpanded, setIsInfoExpanded] = useState(false); // To toggle expansion
 
   const containerRef = useRef();
 
@@ -70,7 +68,7 @@ const PreviewExternalPage = () => {
         if (uniqueCategories.length > 0) {
           const initialCategory = uniqueCategories[0];
           setActiveCategory(initialCategory);
-          fetchCategoryItems(initialCategory, 0);
+          fetchCategoryItems(initialCategory);
         }
       } catch (error) {
         console.error("Failed to fetch categories or items:", error);
@@ -80,14 +78,12 @@ const PreviewExternalPage = () => {
     fetchCategoriesAndItems();
   }, [userId]);
 
-  // Fetch items for a specific category with pagination
-  const fetchCategoryItems = async (category, offset) => {
-    if (itemsCache[category]?.length > offset) {
+  // Fetch items for a specific category
+  const fetchCategoryItems = async (category) => {
+    if (itemsCache[category]) {
+      // Load from cache
       console.log("From Cache");
-      setVisibleItems((prev) => [
-        ...prev,
-        ...itemsCache[category].slice(offset, offset + ITEMS_PER_PAGE),
-      ]);
+      setVisibleItems(itemsCache[category]);
       return;
     }
 
@@ -109,13 +105,10 @@ const PreviewExternalPage = () => {
 
       setItemsCache((prev) => ({
         ...prev,
-        [category]: [...(prev[category] || []), ...fetchedItems],
+        [category]: fetchedItems,
       }));
 
-      setVisibleItems((prev) => [
-        ...prev,
-        ...fetchedItems.slice(offset, offset + ITEMS_PER_PAGE),
-      ]);
+      setVisibleItems(fetchedItems);
       console.log("From DB");
     } catch (error) {
       console.error("Failed to fetch category items:", error);
@@ -126,57 +119,104 @@ const PreviewExternalPage = () => {
 
   // Handle category change
   const handleCategoryChange = (category) => {
+    if (category === activeCategory) return; // Prevent redundant re-fetch
     setActiveCategory(category);
-    setScrollOffset(0);
     setVisibleItems([]);
-    if (itemsCache[category]?.length) {
-      console.log("from cache");
-      setVisibleItems(itemsCache[category].slice(0, ITEMS_PER_PAGE));
+
+    if (itemsCache[category]) {
+      // Load from cache
+      setVisibleItems(itemsCache[category]);
     } else {
-      fetchCategoryItems(category, 0);
-      console.log("from db");
+      fetchCategoryItems(category);
     }
   };
+  
+  const toggleInfoExpansion = () => {
+    setIsInfoExpanded(!isInfoExpanded);
+  };
 
-  // Handle lazy loading on scroll
-  const handleScroll = useCallback(() => {
-    if (
-      containerRef.current &&
-      containerRef.current.scrollTop + containerRef.current.clientHeight >=
-        containerRef.current.scrollHeight - 100 &&
-      !isFetching
-    ) {
-      setScrollOffset((prevOffset) => {
-        const newOffset = prevOffset + ITEMS_PER_PAGE;
-        fetchCategoryItems(activeCategory, newOffset);
-        return newOffset;
-      });
-    }
-  }, [activeCategory, isFetching]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    if (container) {
-      container.addEventListener("scroll", handleScroll);
-      return () => container.removeEventListener("scroll", handleScroll);
-    }
-  }, [handleScroll]);
 
   return (
     <div>
       {/* Restaurant Info */}
       {restaurantInfo && (
-        <div className="w-full p-4 rounded-md">
-          <div className="flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-bold">
-                {restaurantInfo.restaurantName}
-              </h2>
-              <p>{restaurantInfo.address}</p>
+        <div
+          className={`w-full z-20 p-4 rounded-md transition-transform ${
+            isInfoExpanded ? "h-auto" : "min-h-[80px]"
+          }`}
+        >
+          <div
+            className="cursor-pointer flex justify-between items-center"
+            onClick={toggleInfoExpansion}
+          >
+            <div className="flex items-center gap-4 text-bgGreen">
+              {restaurantInfo.imageUrl && (
+                <img
+                  src={restaurantInfo.imageUrl}
+                  alt="Restaurant"
+                  className="w-16 h-16 object-cover rounded-full"
+                />
+              )}
+              <div>
+                <h2 className="text-xl font-bold">
+                  {restaurantInfo.restaurantName}
+                </h2>
+                <p className="text-sm text-bgGreen">{restaurantInfo.address}</p>
+                <p>
+                  <strong>Tel: </strong>
+                  <a href={`tel:${restaurantInfo.phone}`}>
+                    {restaurantInfo.phone}
+                  </a>
+                </p>
+                <p>
+                  {" "}
+                  <strong>Website: </strong>
+                  <a href={restaurantInfo.website} target="_blank">
+                    {restaurantInfo.website}
+                  </a>
+                </p>
+              </div>
             </div>
+            <button className="text-sm font-medium text-bgGreen">
+              {isInfoExpanded ? "Mostrar menos" : "Mostrar mais"}
+            </button>
           </div>
+          {isInfoExpanded && (
+            <div className="mt-4 text-bgGreen">
+              <p>
+                <strong>Email:</strong> {restaurantInfo.email}
+              </p>
+              <p>
+                <strong>WiFi:</strong> {restaurantInfo.wifi}
+              </p>
+              <p>
+                <strong>WiFi Password:</strong> {restaurantInfo.wifiPassword}
+              </p>
+              <p>
+                <strong>Horas:</strong>
+              </p>
+              <ul>
+                <li>
+                  Almoço: {restaurantInfo.workingHours.lunchOpen} -{" "}
+                  {restaurantInfo.workingHours.lunchClose}
+                </li>
+                <li>
+                  Jantar: {restaurantInfo.workingHours.dinnerOpen} -{" "}
+                  {restaurantInfo.workingHours.dinnerClose}
+                </li>
+              </ul>
+              <p>
+                <strong>Encerrado:</strong>{" "}
+                {restaurantInfo.workingHours.closedDays.join(", ")}
+              </p>
+              <p>
+                <strong>Descrição:</strong> {restaurantInfo.description}
+              </p>
+            </div>
+          )}
         </div>
       )}
+
 
       {/* Categories */}
       <nav className="sticky top-0 bg-gray-100 z-10">
@@ -210,8 +250,9 @@ const PreviewExternalPage = () => {
             setZoomedImage={(image) => setZoomedImage(image)}
           />
         ))}
-        {isFetching && <p>Loading more items...</p>}
+        {isFetching && <p>Loading items...</p>}
       </div>
+
       {/* Zoomed Image */}
       {zoomedImage && (
         <div
