@@ -185,6 +185,7 @@ const Settings = () => {
                 value={formData.workingHours.lunchOpen}
                 onChange={handleWorkingHoursChange}
                 className="p-2 border rounded-md"
+                pattern="[0-2][0-9]:[0-5][0-9]"
               />
               <span>as</span>
               <input

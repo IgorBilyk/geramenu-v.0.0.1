@@ -22,7 +22,7 @@ export default function CardComponent({
 
   return (
     <Card
-      className="sm:w-full my-4 px-5 shadow-lg rounded-lg lg:w-[50%]"
+      className="sm:w-full my-4 px-5 shadow-lg rounded-lg lg:w-full"
       key={id}
     >
       <CardHeader

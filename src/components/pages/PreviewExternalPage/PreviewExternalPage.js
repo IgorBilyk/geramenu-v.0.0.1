@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { db } from "../../../firebase/firebase";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { db, auth } from "../../../firebase/firebase";
 import {
   collection,
   query,
@@ -8,12 +9,13 @@ import {
   doc,
   getDoc,
 } from "firebase/firestore";
-import { useParams } from "react-router-dom";
 import { FaArrowUp } from "react-icons/fa";
 import CardComponent from "./CardComponent";
+import RestaurantInfo from "./RestaurantInfo";
 
 const PreviewExternalPage = () => {
   const { userId } = useParams();
+  const navigate = useNavigate();
   const [itemsCache, setItemsCache] = useState({});
   const [visibleItems, setVisibleItems] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -24,6 +26,18 @@ const PreviewExternalPage = () => {
   const [isInfoExpanded, setIsInfoExpanded] = useState(false); // To toggle expansion
 
   const containerRef = useRef();
+
+  // Check and set user ID in the URL if missing
+  useEffect(() => {
+    if (!userId) {
+      const currentUserId = auth?.currentUser?.uid || localStorage.getItem("userID");
+      if (currentUserId) {
+        navigate(`/preview/${currentUserId}`, { replace: true });
+      } else {
+        console.error("User ID is missing and cannot be set.");
+      }
+    }
+  }, [userId, navigate]);
 
   // Fetch restaurant data
   useEffect(() => {
@@ -39,7 +53,9 @@ const PreviewExternalPage = () => {
       }
     };
 
-    fetchRestaurantData();
+    if (userId) {
+      fetchRestaurantData();
+    }
   }, [userId]);
 
   // Fetch categories and items for the initial active category
@@ -75,14 +91,15 @@ const PreviewExternalPage = () => {
       }
     };
 
-    fetchCategoriesAndItems();
+    if (userId) {
+      fetchCategoriesAndItems();
+    }
   }, [userId]);
 
   // Fetch items for a specific category
   const fetchCategoryItems = async (category) => {
     if (itemsCache[category]) {
       // Load from cache
-      console.log("From Cache");
       setVisibleItems(itemsCache[category]);
       return;
     }
@@ -109,7 +126,6 @@ const PreviewExternalPage = () => {
       }));
 
       setVisibleItems(fetchedItems);
-      console.log("From DB");
     } catch (error) {
       console.error("Failed to fetch category items:", error);
     } finally {
@@ -130,97 +146,26 @@ const PreviewExternalPage = () => {
       fetchCategoryItems(category);
     }
   };
-  
+
   const toggleInfoExpansion = () => {
     setIsInfoExpanded(!isInfoExpanded);
   };
 
-
   return (
-    <div>
+    <div className="p-3 lg:w-[75%] lg:m-auto font-[1rem]">
       {/* Restaurant Info */}
-      {restaurantInfo && (
-        <div
-          className={`w-full z-20 p-4 rounded-md transition-transform ${
-            isInfoExpanded ? "h-auto" : "min-h-[80px]"
-          }`}
-        >
-          <div
-            className="cursor-pointer flex justify-between items-center"
-            onClick={toggleInfoExpansion}
-          >
-            <div className="flex items-center gap-4 text-bgGreen">
-              {restaurantInfo.imageUrl && (
-                <img
-                  src={restaurantInfo.imageUrl}
-                  alt="Restaurant"
-                  className="w-16 h-16 object-cover rounded-full"
-                />
-              )}
-              <div>
-                <h2 className="text-xl font-bold">
-                  {restaurantInfo.restaurantName}
-                </h2>
-                <p className="text-sm text-bgGreen">{restaurantInfo.address}</p>
-                <p>
-                  <strong>Tel: </strong>
-                  <a href={`tel:${restaurantInfo.phone}`}>
-                    {restaurantInfo.phone}
-                  </a>
-                </p>
-                <p>
-                  {" "}
-                  <strong>Website: </strong>
-                  <a href={restaurantInfo.website} target="_blank">
-                    {restaurantInfo.website}
-                  </a>
-                </p>
-              </div>
-            </div>
-            <button className="text-sm font-medium text-bgGreen">
-              {isInfoExpanded ? "Mostrar menos" : "Mostrar mais"}
-            </button>
-          </div>
-          {isInfoExpanded && (
-            <div className="mt-4 text-bgGreen">
-              <p>
-                <strong>Email:</strong> {restaurantInfo.email}
-              </p>
-              <p>
-                <strong>WiFi:</strong> {restaurantInfo.wifi}
-              </p>
-              <p>
-                <strong>WiFi Password:</strong> {restaurantInfo.wifiPassword}
-              </p>
-              <p>
-                <strong>Horas:</strong>
-              </p>
-              <ul>
-                <li>
-                  Almoço: {restaurantInfo.workingHours.lunchOpen} -{" "}
-                  {restaurantInfo.workingHours.lunchClose}
-                </li>
-                <li>
-                  Jantar: {restaurantInfo.workingHours.dinnerOpen} -{" "}
-                  {restaurantInfo.workingHours.dinnerClose}
-                </li>
-              </ul>
-              <p>
-                <strong>Encerrado:</strong>{" "}
-                {restaurantInfo.workingHours.closedDays.join(", ")}
-              </p>
-              <p>
-                <strong>Descrição:</strong> {restaurantInfo.description}
-              </p>
-            </div>
-          )}
-        </div>
-      )}
-
+      <Link to="/" className="bg-bgGreen text-textWhite rounded-lg p-2">
+        Home
+      </Link>
+      <RestaurantInfo
+        toggleInfoExpansion={toggleInfoExpansion}
+        isInfoExpanded={isInfoExpanded}
+        restaurantInfo={restaurantInfo}
+      />
 
       {/* Categories */}
       <nav className="sticky top-0 bg-gray-100 z-10">
-        <div className="flex overflow-x-auto py-2">
+        <div className="flex overflow-x-auto py-2 px-2 space-x-4">
           {categories.map((category) => (
             <button
               key={category}
@@ -240,7 +185,7 @@ const PreviewExternalPage = () => {
       {/* Items */}
       <div
         ref={containerRef}
-        className="container mx-auto h-[70vh] overflow-y-auto"
+        className="container mx-auto h-[70vh] overflow-y-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
       >
         {visibleItems.map((item) => (
           <CardComponent
@@ -270,8 +215,9 @@ const PreviewExternalPage = () => {
       {/* Scroll to Top */}
       <button
         onClick={() =>
-          containerRef.current.scrollTo({ top: 0, behavior: "smooth" })
+          containerRef?.current.scrollTo({ top: 0, behavior: "smooth" })
         }
+        className="fixed bottom-4 right-4 bg-bgGreen text-white p-2 rounded-full shadow-lg"
       >
         <FaArrowUp />
       </button>

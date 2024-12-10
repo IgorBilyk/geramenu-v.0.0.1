@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { db } from "../../../firebase/firebase";
-import { auth } from "../../../firebase/firebase";
-import {
+import { db,auth } from "../../../firebase/firebase";
+/* import { auth } from "../../../firebase/firebase";
+ */import {
   collection,
   query,
   where,
@@ -26,7 +26,8 @@ import { successMessage } from "../../../handlers/toastHandler";
 import CardComponent from "../PreviewExternalPage/CardComponent";
 
 const Home = () => {
-  const { userId } = useParams();
+  /* const { userId } = useParams(); */
+  const [userId, setUserId] = useState(auth?.currentUser?.uid || localStorage.getItem("userID"))
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState("");
@@ -109,13 +110,13 @@ const Home = () => {
 
     // Cleanup on unmount
     return () => observer.disconnect();
-  }, [categories])
+  }, [categories]);
 
   return (
     <div>
       <div ref={topRef}>
         <div className="sticky top-0 z-10">
-          <Navbar />
+          <Navbar userId={userId} />
           <nav className="sticky top-[64px] z-40 bg-gray shadow-lg px-4 py-2">
             <div className="flex flex-wrap justify-center gap-2 md:gap-4 py-3">
               {categories.map((category) => (
@@ -157,9 +158,9 @@ const Home = () => {
               key={category}
               ref={(el) => (categoryRefs.current[category] = el)}
               data-category={category}
-              className="my-8"
+              className="my-8 lg:w-full"
             >
-              <div className="flex flex-col w-full">
+              <div className="flex flex-col w-full lg:grid lg:grid-cols-2">
                 {items
                   .filter((item) => item.category === category)
                   .map((item) => (

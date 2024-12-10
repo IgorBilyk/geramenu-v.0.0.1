@@ -20,22 +20,29 @@ const QRPage = () => {
     const canvas = document.createElement("canvas");
     const ctx = canvas.getContext("2d");
     const img = new Image();
-
+  
     img.onload = function () {
       canvas.width = img.width;
       canvas.height = img.height;
       ctx.drawImage(img, 0, 0);
-
+  
       const pdf = new jsPDF();
-
-      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 70, 40, 85, 85);
-      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 70, 145, 85, 85);
-
+  
+      // Add text and QR codes
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(16);
+      pdf.text("Menu Digital", 110, 35, { align: "center" }); // Text above the first QR code
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 70, 40, 85, 85); // First QR code
+  
+      pdf.text("Menu Digital", 110, 140, { align: "center" }); // Text above the second QR code
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 70, 145, 85, 85); // Second QR code
+  
       pdf.save("menu.pdf");
     };
-
+  
     img.src = "data:image/svg+xml;base64," + btoa(svgData);
   };
+  
 
 
   return (

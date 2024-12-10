@@ -14,14 +14,14 @@ import { auth } from "../../firebase/firebase";
 import { useEffect, useState } from "react";
 import { getItem } from "../../utils/localStorage";
 
-const Navbar = ({ active }) => {
+const Navbar = ({ active, userId }) => {
   const navigate = useNavigate();
-  const [userID, setUserID] = useState(getItem("userID") || null);
-
+/*   const [userID, setUserID] = useState(getItem("userID") || null);
+ */
   const [navigation, setNavigation] = useState([]);
 
   useEffect(() => {
-    console.log("from Navbar", userID);
+    console.log("from Navbar", userId);
     setNavigation([
       {
         name: "Home",
@@ -30,7 +30,7 @@ const Navbar = ({ active }) => {
       },
       {
         name: "Pré-visualização",
-        href: `/previewext/${userID}`,
+        href: `/previewext/${userId}`,
         current: active === "preview",
       },
       {
@@ -39,19 +39,19 @@ const Navbar = ({ active }) => {
         current: active === "qr",
       },
     ]);
-  }, [userID, active]);
+  }, [userId, active]);
 
   const handleSignOut = async () => {
     await signOut(auth);
     localStorage.removeItem("userID");
-    setUserID(null);
+    /* setUserID(null); */
     navigate("/login");
   };
 
   function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
   }
-
+console.log(userId)
   return (
     <Disclosure
       as="nav"
@@ -110,7 +110,8 @@ const Navbar = ({ active }) => {
               GeraMenu
             </Link>
             <div className="hidden sm:ml-6 sm:flex space-x-4">
-              {navigation.map((item) => (
+            <Link to={`/previewext/${userId}`}>Pré-visualização</Link>
+              {/* {navigation.map((item) => (
                 <Link
                   key={item.name}
                   to={item.href}
@@ -124,7 +125,7 @@ const Navbar = ({ active }) => {
                 >
                   {item.name}
                 </Link>
-              ))}
+              ))} */}
             </div>
           </div>
 
