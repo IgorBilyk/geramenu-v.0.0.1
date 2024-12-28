@@ -113,71 +113,73 @@ const Home = () => {
   }, [categories]);
 
   return (
-    <div>
-      <div ref={topRef}>
-        <div className="sticky top-0 z-10">
-          <Navbar userId={userId} />
-          <nav className="sticky top-[64px] z-40 bg-gray shadow-lg px-4 py-2">
-            <div className="flex flex-wrap justify-center gap-2 md:gap-4 py-3">
-              {categories.map((category) => (
-                <button
-                  key={category}
-                  onClick={() => handleScrollToCategory(category)}
-                  className={`px-4 py-2 rounded-xl border-2 ${
-                    activeCategory === category
-                      ? "bg-bgGreen text-textWhite"
-                      : "text-bgGreen"
-                  }`}
-                >
-                  {category}
-                </button>
-              ))}
-            </div>
-          </nav>
-          <div className="container mx-auto pt-">
-            <div className="flex justify-end items-center mb-8 mx-2">
-              <CustomButton
-                title="Adicionar"
-                onPress={() => openModal()}
-                styles="m-5 bg-bgGreen text-textWhite"
-              />
-            </div>
-          </div>
-        </div>
-
-        {items.length === 0 && (
-          <p className="text-center font-medium">No Items</p>
-        )}
-
-        {items.length > 0 && (
-          <h1 className="text-4xl font-bold mx-[100px]">Ementa</h1>
-        )}
-        <div className="grid md:grid-cols-2">
+   <div>
+  <div ref={topRef}>
+    <div className="sticky top-0 z-10">
+      <Navbar userId={userId} />
+      <nav className="sticky top-[64px] z-40 bg-gray shadow-lg px-4 py-2">
+        <div className="flex flex-wrap justify-center gap-2 md:gap-4 py-3">
           {categories.map((category) => (
-            <div
+            <button
               key={category}
-              ref={(el) => (categoryRefs.current[category] = el)}
-              data-category={category}
-              className="my-8 lg:w-full"
+              onClick={() => handleScrollToCategory(category)}
+              className={`px-4 py-2 rounded-xl border-2 ${
+                activeCategory === category
+                  ? "bg-bgGreen text-textWhite"
+                  : "text-bgGreen"
+              }`}
             >
-              <div className="flex flex-col w-full lg:grid lg:grid-cols-2">
-                {items
-                  .filter((item) => item.category === category)
-                  .map((item) => (
-                    <CardComponent
-                      item={item}
-                      key={item.id}
-                      setZoomedImage={setZoomedImage}
-                      openModal={openModal}
-                      handleDeleteItem={handleDeleteItem}
-                      external={false}
-                    />
-                  ))}
-              </div>
-            </div>
+             {category} <span className="text-xs"> {items.length}</span>
+            </button>
           ))}
         </div>
+      </nav>
+      <div className="container mx-auto pt-">
+        <div className="flex justify-end items-center mb-8 mx-2">
+          <CustomButton
+            title="Adicionar"
+            onPress={() => openModal()}
+            styles="m-5 bg-bgGreen text-textWhite"
+          />
+        </div>
       </div>
+    </div>
+
+    {items.length === 0 && (
+      <p className="text-center font-medium">No Items</p>
+    )}
+
+    {items.length > 0 && (
+      <h1 className="text-4xl font-bold mx-[100px]">Ementa</h1>
+    )}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      {categories.map((category) => (
+/*         <div
+          key={category}
+          ref={(el) => (categoryRefs.current[category] = el)}
+          data-category={category}
+          className="my-8"
+        >
+          <div className="flex flex-col"> */
+            items
+              .filter((item) => item.category === category)
+              .map((item) => (
+                <CardComponent
+                  item={item}
+                  key={item.id}
+                  setZoomedImage={setZoomedImage}
+                  openModal={openModal}
+                  handleDeleteItem={handleDeleteItem}
+                  external={false}
+                />
+              ))
+      /*     </div>
+        </div> */
+      ))}
+    </div>
+  </div>
+
+
 
       <button
         onClick={scrollToTop}

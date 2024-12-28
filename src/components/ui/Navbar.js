@@ -16,8 +16,8 @@ import { getItem } from "../../utils/localStorage";
 
 const Navbar = ({ active, userId }) => {
   const navigate = useNavigate();
-/*   const [userID, setUserID] = useState(getItem("userID") || null);
- */
+  /*   const [userID, setUserID] = useState(getItem("userID") || null);
+   */
   const [navigation, setNavigation] = useState([]);
 
   useEffect(() => {
@@ -51,7 +51,7 @@ const Navbar = ({ active, userId }) => {
   function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
   }
-console.log(userId)
+  console.log(userId);
   return (
     <Disclosure
       as="nav"
@@ -110,22 +110,8 @@ console.log(userId)
               GeraMenu
             </Link>
             <div className="hidden sm:ml-6 sm:flex space-x-4">
-            <Link to={`/previewext/${userId}`}>Pré-visualização</Link>
-              {/* {navigation.map((item) => (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={classNames(
-                    item.current
-                      ? "bg-gray-900 text-white"
-                      : "text-gray-300 hover:bg-gray-700 hover:text-white",
-                    "rounded-md px-3 py-2 text-sm font-medium"
-                  )}
-                  aria-current={item.current ? "page" : undefined}
-                >
-                  {item.name}
-                </Link>
-              ))} */}
+              <Link to={`/previewext/${userId}`}>Pré-visualização</Link>
+              <Link to={`/qr`}>QR Code</Link>
             </div>
           </div>
 

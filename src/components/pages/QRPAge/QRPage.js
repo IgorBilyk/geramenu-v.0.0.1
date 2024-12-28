@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef } from "react";
+import {useParams } from "react-router-dom";
+
 import { QRCodeSVG } from "qrcode.react";
 import jsPDF from "jspdf";
 import { FacebookShareButton, TwitterShareButton } from "react-share";
@@ -6,6 +8,8 @@ import Navbar from "../../ui/Navbar";
 
 const QRPage = () => {
   const [userId, setUserId] = useState(null);
+  const { Id } = useParams();
+
   const qrRef = useRef();
 
   useEffect(() => {
@@ -33,9 +37,10 @@ const QRPage = () => {
       pdf.setFontSize(16);
       pdf.text("Menu Digital", 110, 35, { align: "center" }); // Text above the first QR code
       pdf.addImage(canvas.toDataURL("image/png"), "PNG", 70, 40, 85, 85); // First QR code
+
   
-      pdf.text("Menu Digital", 110, 140, { align: "center" }); // Text above the second QR code
-      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 70, 145, 85, 85); // Second QR code
+      pdf.text("Menu Digital", 110, 150, { align: "center" }); // Text above the second QR code
+      pdf.addImage(canvas.toDataURL("image/png"), "PNG", 70, 155, 85, 85); // Second QR code
   
       pdf.save("menu.pdf");
     };

@@ -176,7 +176,7 @@ const PreviewExternalPage = () => {
                   : ""
               }`}
             >
-              {category}
+              {category} <span>{visibleItems.length}</span>
             </button>
           ))}
         </div>
