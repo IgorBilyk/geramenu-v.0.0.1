@@ -16,8 +16,7 @@ import { getItem } from "../../utils/localStorage";
 
 const Navbar = ({ active, userId }) => {
   const navigate = useNavigate();
-  /*   const [userID, setUserID] = useState(getItem("userID") || null);
-   */
+
   const [navigation, setNavigation] = useState([]);
 
   useEffect(() => {
@@ -44,7 +43,7 @@ const Navbar = ({ active, userId }) => {
   const handleSignOut = async () => {
     await signOut(auth);
     localStorage.removeItem("userID");
-    /* setUserID(null); */
+   
     navigate("/login");
   };
 

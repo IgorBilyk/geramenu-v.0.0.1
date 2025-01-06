@@ -1,9 +1,13 @@
-import React from 'react'
+import React from "react";
 
-export default function RestaurantInfo({restaurantInfo,isInfoExpanded,toggleInfoExpansion}) {
+export default function RestaurantInfo({
+  restaurantInfo,
+  isInfoExpanded,
+  toggleInfoExpansion,
+}) {
   return (
     <div>
-       {restaurantInfo && (
+      {restaurantInfo && (
         <div
           className={`w-full z-20 p-4 rounded-md transition-transform ${
             isInfoExpanded ? "h-auto" : "min-h-[80px]"
@@ -25,7 +29,9 @@ export default function RestaurantInfo({restaurantInfo,isInfoExpanded,toggleInfo
                 <h2 className="text-xl font-bold">
                   {restaurantInfo?.restaurantName}
                 </h2>
-                <p className="text-sm text-bgGreen">{restaurantInfo?.address}</p>
+                <p className="text-sm text-bgGreen">
+                  {restaurantInfo?.address}
+                </p>
                 <p>
                   <strong>Tel: </strong>
                   <a href={`tel:${restaurantInfo?.phone}`}>
@@ -33,7 +39,6 @@ export default function RestaurantInfo({restaurantInfo,isInfoExpanded,toggleInfo
                   </a>
                 </p>
                 <p>
-                  {" "}
                   <strong>Website: </strong>
                   <a href={restaurantInfo?.website} target="_blank">
                     {restaurantInfo?.website}
@@ -80,7 +85,6 @@ export default function RestaurantInfo({restaurantInfo,isInfoExpanded,toggleInfo
           )}
         </div>
       )}
-      
     </div>
-  )
+  );
 }

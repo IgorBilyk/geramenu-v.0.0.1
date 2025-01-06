@@ -15,6 +15,17 @@ import Test from "./components/test/Test";
 import ProtectedRoute from './components/protectedRoute/ProtectedRoute'
 import { AuthProvider } from "./utils/AuthContext";
 import NotFound from "./components/pages/NotFound/NotFound";
+import { getApp } from "@firebase/app";
+import { getStripePayments } from "@invertase/firestore-stripe-payments";
+import SubscriptionPage from "./components/checkout/SubscriptionForm ";
+
+const app = getApp();
+const payments = getStripePayments(app, {
+  productsCollection: "products",
+  customersCollection: "customers",
+});
+
+
 
 function App() {
   return (
@@ -24,6 +35,7 @@ function App() {
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/previewext/:userId" element={<PreviewExternalPage />} />
+          <Route path="/checkout" element={<SubscriptionPage />} />
 
           {/* Protected Routes */}
           <Route
@@ -31,15 +43,6 @@ function App() {
             element={
               <ProtectedRoute>
                 <Home />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/menu"
-          
-            element={
-              <ProtectedRoute>
-                <AddMenu />
               </ProtectedRoute>
             }
           />

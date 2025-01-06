@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react";
-import { db,auth } from "../../../firebase/firebase";
-/* import { auth } from "../../../firebase/firebase";
- */import {
+import { db, auth } from "../../../firebase/firebase";
+
+import {
   collection,
   query,
   where,
@@ -9,6 +9,7 @@ import { db,auth } from "../../../firebase/firebase";
   doc,
   deleteDoc,
 } from "firebase/firestore";
+
 import { Toaster } from "sonner";
 import { useParams } from "react-router-dom";
 import Navbar from "../../ui/Navbar";
@@ -16,18 +17,19 @@ import { FaArrowUp } from "react-icons/fa";
 import AddMenu from "../AddMenu/AddMenu";
 
 import CustomButton from "../../ui/Button";
-/* import {
-  Card,
-  CardHeader,
-  CardBody,
-  Typography,
-} from "@material-tailwind/react"; */
+
 import { successMessage } from "../../../handlers/toastHandler";
 import CardComponent from "../PreviewExternalPage/CardComponent";
 
+
+
+
+
+
 const Home = () => {
-  /* const { userId } = useParams(); */
-  const [userId, setUserId] = useState(auth?.currentUser?.uid || localStorage.getItem("userID"))
+  const [userId, setUserId] = useState(
+    auth?.currentUser?.uid || localStorage.getItem("userID")
+  );
   const [items, setItems] = useState([]);
   const [categories, setCategories] = useState([]);
   const [activeCategory, setActiveCategory] = useState("");
@@ -36,6 +38,8 @@ const Home = () => {
   const [zoomedImage, setZoomedImage] = useState(null); // State for zoomed image
   const categoryRefs = useRef({});
   const topRef = useRef(null);
+
+  /* window.location.assign(session.url); */
 
   useEffect(() => {
     const userId = auth?.currentUser?.uid || localStorage.getItem("userID");
@@ -113,48 +117,48 @@ const Home = () => {
   }, [categories]);
 
   return (
-   <div>
-  <div ref={topRef}>
-    <div className="sticky top-0 z-10">
-      <Navbar userId={userId} />
-      <nav className="sticky top-[64px] z-40 bg-gray shadow-lg px-4 py-2">
-        <div className="flex flex-wrap justify-center gap-2 md:gap-4 py-3">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => handleScrollToCategory(category)}
-              className={`px-4 py-2 rounded-xl border-2 ${
-                activeCategory === category
-                  ? "bg-bgGreen text-textWhite"
-                  : "text-bgGreen"
-              }`}
-            >
-             {category} <span className="text-xs"> {items.length}</span>
-            </button>
-          ))}
+    <div>
+      <div ref={topRef}>
+        <div className="sticky top-0 z-10">
+          <Navbar userId={userId} />
+          <nav className="sticky top-[64px] z-40 bg-gray shadow-lg px-4 py-2">
+            <div className="flex flex-wrap justify-center gap-2 md:gap-4 py-3">
+              {categories.map((category) => (
+                <button
+                  key={category}
+                  onClick={() => handleScrollToCategory(category)}
+                  className={`px-4 py-2 rounded-xl border-2 ${
+                    activeCategory === category
+                      ? "bg-bgGreen text-textWhite"
+                      : "text-bgGreen"
+                  }`}
+                >
+                  {category}
+                </button>
+              ))}
+            </div>
+          </nav>
+          <div className="container mx-auto pt-">
+            <div className="flex justify-end items-center mb-8 mx-2">
+              <CustomButton
+                title="Adicionar"
+                onPress={() => openModal()}
+                styles="m-5 bg-bgGreen text-textWhite"
+              />
+            </div>
+          </div>
         </div>
-      </nav>
-      <div className="container mx-auto pt-">
-        <div className="flex justify-end items-center mb-8 mx-2">
-          <CustomButton
-            title="Adicionar"
-            onPress={() => openModal()}
-            styles="m-5 bg-bgGreen text-textWhite"
-          />
-        </div>
-      </div>
-    </div>
 
-    {items.length === 0 && (
-      <p className="text-center font-medium">No Items</p>
-    )}
+        {items.length === 0 && (
+          <p className="text-center font-medium">No Items</p>
+        )}
 
-    {items.length > 0 && (
-      <h1 className="text-4xl font-bold mx-[100px]">Ementa</h1>
-    )}
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-      {categories.map((category) => (
-/*         <div
+        {items.length > 0 && (
+          <h1 className="text-4xl font-bold mx-[100px]">Ementa</h1>
+        )}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {categories.map((category) =>
+            /*         <div
           key={category}
           ref={(el) => (categoryRefs.current[category] = el)}
           data-category={category}
@@ -173,13 +177,11 @@ const Home = () => {
                   external={false}
                 />
               ))
-      /*     </div>
+            /*     </div>
         </div> */
-      ))}
-    </div>
-  </div>
-
-
+          )}
+        </div>
+      </div>
 
       <button
         onClick={scrollToTop}

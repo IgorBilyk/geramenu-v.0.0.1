@@ -151,6 +151,7 @@ const PreviewExternalPage = () => {
     setIsInfoExpanded(!isInfoExpanded);
   };
 
+  console.log(categories)
   return (
     <div className="p-3 lg:w-[75%] lg:m-auto font-[1rem]">
       {/* Restaurant Info */}
@@ -176,7 +177,7 @@ const PreviewExternalPage = () => {
                   : ""
               }`}
             >
-              {category} <span>{visibleItems.length}</span>
+              {category}
             </button>
           ))}
         </div>
