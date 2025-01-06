@@ -3,7 +3,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { initializeFirestore, persistentLocalCache, persistentSingleTabManager } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
-import { getFunctions, httpsCallable } from 'firebase/functions';
+
 
 export const firebaseConfig = {
     apiKey: "AIzaSyDFfFdfV8ozLGa0xpfxAW5tzqluSTs1f0g",
@@ -28,4 +28,3 @@ export const db = initializeFirestore(app, {
 // Export other Firebase services
 export const auth = getAuth(app);
 export const storage = getStorage(app);
-const functions = getFunctions(app); // Initialize Firebase Functions

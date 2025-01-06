@@ -7,12 +7,12 @@ import {
   MenuItems,
   MenuItem,
 } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+
+import {  XMarkIcon } from "@heroicons/react/24/outline";
 import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/firebase";
 import { useEffect, useState } from "react";
-import { getItem } from "../../utils/localStorage";
 
 const Navbar = ({ active, userId }) => {
   const navigate = useNavigate();
@@ -61,7 +61,6 @@ const Navbar = ({ active, userId }) => {
           {/* Mobile menu button */}
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
             <DisclosureButton className="inline-flex items-center justify-center p-2 text-textWhite hover:bg-gray-700 hover:text-white focus:outline-none">
-              {/* <Bars3Icon className="block h-6 w-6" aria-hidden="true" /> */}
               <svg
                 width="465"
                 height="85"
@@ -145,7 +144,7 @@ const Navbar = ({ active, userId }) => {
                 <MenuItem
                   as="a"
                   href="/settings"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  className="block px-4 py-2 text-sm text-white hover:bg-gray-100"
                 >
                   Configurações
                 </MenuItem>
@@ -154,7 +153,7 @@ const Navbar = ({ active, userId }) => {
                 <MenuItem
                   as="button"
                   onClick={handleSignOut}
-                  className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                  className="block w-full px-4 py-2 text-left text-sm text-white hover:bg-gray-100"
                 >
                   Sair
                 </MenuItem>

@@ -1,133 +1,108 @@
-import React, { useState, useEffect } from "react";
-import { useFirestore } from "react-redux-firebase";
-import { useFirebase } from "react-redux-firebase";
-import {
-  Elements,
-  CardElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
+import React, { useState } from "react";
 import { loadStripe } from "@stripe/stripe-js";
-import { initializeApp } from "firebase/app";
-import { getFunctions, httpsCallable } from "firebase/functions";
-import { getAuth } from "firebase/auth";
-import { firebaseConfig } from "../../firebase/firebase";
 
-const stripePromise = loadStripe(
-  "pk_test_51QTmYLGSurLaCLspbPg5Jd0JFmq9bbkHXJoRoFpdvvSMAsyQRw7oU7Vr4M5nY5UTf3FbGxltpBYdgMLky3F8gfwE00ZVT9qkpG"
-); // Replace with your actual publishable key
+import { Link, useNavigate } from "react-router-dom";
 
-const SubscriptionForm = () => {
-  const firestore = useFirestore();
-  const firebase = useFirebase();
-  const stripe = useStripe();
-  const elements = useElements();
-  const [selectedPlan, setSelectedPlan] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [auth, setAuth] = useState(null);
-  const [functions, setFunctions] = useState(null);
+import {
+  Dialog,
+  DialogBackdrop,
+  DialogPanel,
+  DialogTitle,
+} from "@headlessui/react";
+import {
+  CreditCardIcon,
+} from "@heroicons/react/24/outline";
 
-  useEffect(() => {
-    const initializeFirebase = async () => {
-      const app = initializeApp(firebaseConfig);
-      const authInstance = getAuth(app);
-      setAuth(authInstance);
-      const functionsInstance = getFunctions(app);
-      setFunctions(functionsInstance);
-    };
+let stripePromise;
+const getStripe = () => {
+  if (!stripePromise) {
+    stripePromise = loadStripe(process.env.REACT_APP_STRIPE_API_KEY);
+  }
+  return stripePromise;
+};
 
-    initializeFirebase();
-  }, []);
+function SubscriptionPage() {
+  const [open, setOpen] = useState(true);
 
-  const handlePlanChange = (plan) => {
-    setSelectedPlan(plan);
+  const item = {
+    price: "price_1QeIbZGSurLaCLspFHiA7hmQ",
+    quantity: 1,
+  };
+  const checkoutOptions = {
+    lineItems: [item],
+    mode: "subscription",
+    successUrl: `${window.location.origin}/success`,
+    cancelUrl: `${window.location.origin}/cancel`,
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const { error: cardError, paymentMethod } =
-        await stripe.createPaymentMethod({
-          type: "card",
-          card: elements.getElement(CardElement),
-        });
-
-      if (cardError) {
-        setError(cardError.message);
-        setIsLoading(false);
-        return;
-      }
-
-      // Create a Stripe customer
-      const { customerId } = await httpsCallable(
-        functions,
-        "createStripeCustomer"
-      )({
-        email: auth.currentUser.email,
-        paymentMethodId: paymentMethod.id,
-      });
-
-      // Create a Stripe subscription
-      const { subscriptionId } = await httpsCallable(
-        functions,
-        "createSubscription"
-      )({
-        planId: selectedPlan.id,
-        customerId,
-      });
-
-      // Update user data in Firestore
-      await firestore.collection("users").doc(auth.currentUser.uid).update({
-        stripeCustomerId: customerId,
-        stripeSubscriptionId: subscriptionId,
-      });
-
-      // Success
-      setIsLoading(false);
-      // ... (Handle success, e.g., redirect to a thank you page)
-    } catch (error) {
-      setError(error.message);
-      setIsLoading(false);
-    }
+  const redirectToCheckout = async () => {
+    const stripe = await getStripe();
+    const { error } = await stripe.redirectToCheckout(checkoutOptions);
+    console.log("Checkout error", error);
   };
-
   return (
     <div>
-      <h2>Choose a Subscription Plan</h2>
-      <div>
-        {/* Display your subscription plans here */}
-        {/* Example: */}
-        <button onClick={() => handlePlanChange({ id: "monthly_plan_id" })}>
-          Monthly Plan
-        </button>
-        <button onClick={() => handlePlanChange({ id: "yearly_plan_id" })}>
-          Yearly Plan
-        </button>
-      </div>
+  
+{/*       <button onClick={redirectToCheckout}>Buy</button>
+ */}      <Dialog open={open} onClose={setOpen} className="relative z-10">
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-gray-500/75 transition-opacity data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in"
+        />
 
-      {selectedPlan && (
-        <form onSubmit={handleSubmit} className="w-[40%]">
-          <CardElement />
-          <button type="submit" disabled={isLoading}>
-            {isLoading ? "Processing..." : "Subscribe"}
-          </button>
-          {error && <div>{error}</div>}
-        </form>
-      )}
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <DialogPanel
+              transition
+              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-[closed]:translate-y-4 data-[closed]:opacity-0 data-[enter]:duration-300 data-[leave]:duration-200 data-[enter]:ease-out data-[leave]:ease-in sm:my-8 sm:w-full sm:max-w-lg data-[closed]:sm:translate-y-0 data-[closed]:sm:scale-95"
+            >
+              <div className="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                <div className="sm:flex sm:items-start">
+                  <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:size-10">
+                    <CreditCardIcon
+                      aria-hidden="true"
+                      className="size-7 text-red-400"
+                    />
+                  </div>
+                  <div className="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left">
+                    <DialogTitle
+                      as="h3"
+                      className="text-base font-semibold text-gray-900"
+                    >
+                      Free trial period has ended!
+                    </DialogTitle>
+                    <div className="mt-2">
+                      <p className="text-sm text-gray-500">
+                        Please proceed with payment in order to continue using
+                        our service.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                <button
+                  type="button"
+                  onClick={redirectToCheckout}
+                  className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto"
+                >
+                  Activar
+                </button>
+                <button
+                  type="button"
+                  data-autofocus
+                  onClick={() => setOpen(false)}
+                  className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                >
+                  Cancelar
+                </button>
+              </div>
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
-};
-
-const SubscriptionPage = () => {
-  return (
-    <Elements stripe={stripePromise}>
-      <SubscriptionForm />
-    </Elements>
-  );
-};
+}
 
 export default SubscriptionPage;

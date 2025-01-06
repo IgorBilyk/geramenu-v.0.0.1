@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from "react";
-import {useParams } from "react-router-dom";
 
 import { QRCodeSVG } from "qrcode.react";
 import jsPDF from "jspdf";
@@ -8,7 +7,6 @@ import Navbar from "../../ui/Navbar";
 
 const QRPage = () => {
   const [userId, setUserId] = useState(null);
-  const { Id } = useParams();
 
   const qrRef = useRef();
 

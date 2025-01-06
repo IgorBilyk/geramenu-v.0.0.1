@@ -13,15 +13,12 @@ const logger = require("firebase-functions/logger");
 // Create and deploy your first functions
 // https://firebase.google.com/docs/functions/get-started
 
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const stripe = require("stripe")(
   "sk_test_51QTmYLGSurLaCLspP43XSHAOhodgBzIm31c5BZRMoWHlvBcK7679ayo6A7KwrPBw4QVRVgPMRAZZ0bdjAcBAGD5e00lUJmsNdE"
-); // Replace with your actual secret key
+); 
 
 admin.initializeApp();
 
@@ -63,6 +60,10 @@ exports.createSubscription = functions.https.onCall(async (data, context) => {
       customer: customerId,
       items: [{ plan: planId }],
       trial_period_days: 7, // 7-day free trial
+      trial_settings: {
+        end_behavior: {
+          missing_payment_method: 'cancel',
+        },
     });
 
     // Store subscription ID in Firestore

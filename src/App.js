@@ -1,31 +1,20 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-
-import './index.css';
-
-
+import '@stripe/stripe-js'
+import "./index.css"
 import Login from "./components/pages/Login/Login";
-import AddMenu from "./components/pages/AddMenu/AddMenu";
 import Settings from "./components/pages/settings/Settings";
 import Home from "./components/pages/Home/Home";
 import PreviewExternalPage from "./components/pages/PreviewExternalPage/PreviewExternalPage";
 import QRPage from "./components/pages/QRPAge/QRPage";
 
-import Test from "./components/test/Test";
-
-import ProtectedRoute from './components/protectedRoute/ProtectedRoute'
+import ProtectedRoute from "./components/protectedRoute/ProtectedRoute";
 import { AuthProvider } from "./utils/AuthContext";
+
 import NotFound from "./components/pages/NotFound/NotFound";
-import { getApp } from "@firebase/app";
-import { getStripePayments } from "@invertase/firestore-stripe-payments";
 import SubscriptionPage from "./components/checkout/SubscriptionForm ";
 
-const app = getApp();
-const payments = getStripePayments(app, {
-  productsCollection: "products",
-  customersCollection: "customers",
-});
-
-
+import Success from "./components/checkout/success/Success";
+import Failed from "./components/checkout/failed/Failed";
 
 function App() {
   return (
@@ -63,19 +52,14 @@ function App() {
             }
           />
           <Route
-            path="/test"
+            path="/success"
             element={
               <ProtectedRoute>
-                <Test />
+                <Success />
               </ProtectedRoute>
             }
           />
-           <Route
-            path="*"
-            element={
-             <NotFound/>
-            }
-          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </AuthProvider>

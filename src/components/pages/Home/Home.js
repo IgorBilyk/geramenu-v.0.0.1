@@ -11,7 +11,6 @@ import {
 } from "firebase/firestore";
 
 import { Toaster } from "sonner";
-import { useParams } from "react-router-dom";
 import Navbar from "../../ui/Navbar";
 import { FaArrowUp } from "react-icons/fa";
 import AddMenu from "../AddMenu/AddMenu";

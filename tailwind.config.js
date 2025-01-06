@@ -2,14 +2,22 @@
 module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
-    colors: {
-      bgGreen: "#356061",
-      gray: "#C6D8D3",
-      blue: "#275DAD",
-      red: "#EB5E55",
-      textWhite: "#ffffff",
+    extend: {
+      colors: {
+        bgGreen: "#356061",
+        gray: {
+          100: "#C6D8D3",
+          500: "#8A9A94",
+          900: "#2E3E3B",
+        },
+        red: {
+          100: "#F8E1E1",
+          500: "#EB5E55",
+          600: "#D9534F",
+        },
+        textWhite: "#ffffff",
+      },
     },
-    extend: {},
   },
   plugins: [],
 };
