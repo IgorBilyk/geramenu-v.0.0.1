@@ -165,7 +165,7 @@ const PreviewExternalPage = () => {
       />
 
       {/* Categories */}
-      <nav className="sticky top-0 bg-gray-100 z-10">
+      <nav className="sticky top-0 z-10">
         <div className="flex overflow-x-auto py-2 px-2 space-x-4">
           {categories.map((category) => (
             <button
@@ -174,7 +174,7 @@ const PreviewExternalPage = () => {
               className={`px-4 py-2 ${
                 activeCategory === category
                   ? "bg-bgGreen text-textWhite rounded-lg"
-                  : ""
+                  : "border-2 border-bgGreen text-bgGreen rounded-lg"
               }`}
             >
               {category} {visibleItems.length > 0 && visibleItems[0].category === category && `(${visibleItems.length})` }

@@ -21,10 +21,6 @@ import { successMessage } from "../../../handlers/toastHandler";
 import CardComponent from "../PreviewExternalPage/CardComponent";
 
 
-
-
-
-
 const Home = () => {
   const [userId, setUserId] = useState(
     auth?.currentUser?.uid || localStorage.getItem("userID")
@@ -120,7 +116,7 @@ const Home = () => {
       <div ref={topRef}>
         <div className="sticky top-0 z-10">
           <Navbar userId={userId} />
-          <nav className="sticky top-[64px] z-40 bg-gray shadow-lg px-4 py-2">
+          <nav className="sticky top-[64px] z-40 px-4 py-2">
             <div className="flex flex-wrap justify-center gap-2 md:gap-4 py-3">
               {categories.map((category) => (
                 <button
@@ -128,14 +124,13 @@ const Home = () => {
                   onClick={() => handleScrollToCategory(category)}
                   className={`px-4 py-2 rounded-xl border-2 ${
                     activeCategory === category
-                      ? "bg-bgGreen text-textWhite"
-                      : "text-bgGreen"
+                      ? "bg-bgGreen text-textWhite font-medium"
+                      : " bg-bgGreen text-white"
                   }`}
                 >
                   {category} 
-                  {/* {items.filter((item) => item.category === category).length} */}
                   {items.filter((item) => item.category === category).length > 0 && (
-                    <span className="ml-2 text-sm text-gray-500">
+                    <span className="ml-2 text-sm text-gray-300">
                       ({items.filter((item) => item.category === category).length})
                     </span>
                   )}

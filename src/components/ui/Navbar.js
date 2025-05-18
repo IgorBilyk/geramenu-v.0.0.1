@@ -14,7 +14,9 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../firebase/firebase";
 import { useEffect, useState } from "react";
 
-const Navbar = ({ active, userId }) => {
+const Navbar = ({ active}) => {
+  const userId = auth?.currentUser?.uid || localStorage.getItem("userID");
+
   const navigate = useNavigate();
 
   const [navigation, setNavigation] = useState([]);
