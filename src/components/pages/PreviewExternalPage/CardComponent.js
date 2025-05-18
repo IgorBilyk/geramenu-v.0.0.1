@@ -7,6 +7,10 @@ import {
   Typography,
 } from "@material-tailwind/react";
 
+import { FaCheckCircle } from "react-icons/fa";
+import { ImCross } from "react-icons/im";
+
+
 import CustomButton from "../../ui/Button";
 
 
@@ -19,7 +23,7 @@ export default function CardComponent({
 }) {
   const { id, name, price, image, quantity, unit, description, variants } =
     item;
-
+console.log("item", item);
   return (
     <Card
       className="sm:w-full my-4 px-5 shadow-lg rounded-lg lg:w-full"
@@ -104,7 +108,7 @@ export default function CardComponent({
         </Typography>
       </CardBody>
       {external ? null : (
-        <div className="flex flex-col sm:flex-row justify-around gap-4 pb-4 px-4">
+        <div className="flex flex-col sm:flex-row justify-around items-center gap-4 pb-4 px-4">
           <CustomButton
             title="Editar"
             onPress={() => openModal(item)}
@@ -115,6 +119,12 @@ export default function CardComponent({
             onPress={() => handleDeleteItem(item?.id)}
             styles="bg-red-500 w-full sm:w-auto bg-red text-textWhite"
           />
+          {item.outOfStock? (
+            <ImCross className="size-6 text-red-500"/>
+          ) : (
+            <FaCheckCircle className="size-6 text-rgb(53, 96, 97)"/>
+          )}
+
         </div>
       )}
     </Card>

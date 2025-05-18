@@ -50,7 +50,7 @@ const Navbar = ({ active, userId }) => {
   function classNames(...classes) {
     return classes.filter(Boolean).join(" ");
   }
-  console.log(userId);
+  // console.log(userId);
   return (
     <Disclosure
       as="nav"

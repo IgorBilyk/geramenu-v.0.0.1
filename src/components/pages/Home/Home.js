@@ -132,7 +132,13 @@ const Home = () => {
                       : "text-bgGreen"
                   }`}
                 >
-                  {category}
+                  {category} 
+                  {/* {items.filter((item) => item.category === category).length} */}
+                  {items.filter((item) => item.category === category).length > 0 && (
+                    <span className="ml-2 text-sm text-gray-500">
+                      ({items.filter((item) => item.category === category).length})
+                    </span>
+                  )}
                 </button>
               ))}
             </div>
@@ -157,13 +163,7 @@ const Home = () => {
         )}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {categories.map((category) =>
-            /*         <div
-          key={category}
-          ref={(el) => (categoryRefs.current[category] = el)}
-          data-category={category}
-          className="my-8"
-        >
-          <div className="flex flex-col"> */
+
             items
               .filter((item) => item.category === category)
               .map((item) => (
@@ -176,8 +176,6 @@ const Home = () => {
                   external={false}
                 />
               ))
-            /*     </div>
-        </div> */
           )}
         </div>
       </div>
